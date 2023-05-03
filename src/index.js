@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Tray } = require('electron');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -7,8 +7,19 @@ if (require('electron-squirrel-startup')) {
 }
 
 const createWindow = () => {
-  // Create the browser window.
+  // Add the icon to the tray.
+  const appIcon = new Tray('C:/Users/Gebruiker/Documents/GitHub/DaySphere/resources/1x/icon.png');
+
   const mainWindow = new BrowserWindow({
+    show: false,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#010104',
+      height: 35,
+      symbolColor: '#74b1be'
+    },
+    backgroundColor: '#00000F',
+    icon: 'C:/Users/Gebruiker/Documents/GitHub/DaySphere/resources/1x/icon.png',
     width: 800,
     height: 600,
     webPreferences: {
@@ -16,11 +27,18 @@ const createWindow = () => {
     },
   });
 
+  // Maximizes the window on launch.
+  mainWindow.maximize();
+
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // Adds bade to taskbar icon.
+  // mainWindow.setOverlayIcon('resources/1x/logo.png', 'Description for overlay');
+
+  // Only shows the page when it has rendered all the elements. Should always be last.
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()});
 };
 
 // This method will be called when Electron has finished
