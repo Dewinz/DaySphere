@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import "package:satis_planner/testmod.dart";
+import "package:python_ffi/python_ffi.dart";
 
+void pythontest(arg) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await PythonFfi.instance.initialize();
+  print(TestModule.import().testfunc(arg));
+}
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -11,6 +18,7 @@ class MyApp extends StatelessWidget {
       home: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {
+              pythontest("You");
               // Onpress Code
             },
             child: const Icon(Icons.mic),
