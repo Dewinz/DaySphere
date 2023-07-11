@@ -1,99 +1,345 @@
 import 'package:flutter/material.dart';
 
-/// Flutter code sample for [showDatePicker].
+void main() {
+  runApp(const MyApp());
+}
 
-void main() => runApp(const DatePickerApp());
-
-class DatePickerApp extends StatelessWidget {
-  const DatePickerApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(useMaterial3: true),
-      restorationScopeId: 'app',
-      home: const DatePickerExample(restorationId: 'main'),
+      title: 'Speech Recognition Test',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 34, 6, 138)),
+        useMaterial3: true,
+      ),
+      home: Material(
+        child: Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Calendar(
+                  key: key,
+                ),
+              ),
+            ),
+            EventViewer(key: key),
+          ],
+        ),
+      ),
     );
   }
 }
 
-class DatePickerExample extends StatefulWidget {
-  const DatePickerExample({super.key, this.restorationId});
-
-  final String? restorationId;
+class Calendar extends StatefulWidget {
+  const Calendar({super.key});
 
   @override
-  State<DatePickerExample> createState() => _DatePickerExampleState();
+  State<Calendar> createState() => _CalendarState();
 }
 
-/// RestorationProperty objects can be used because of RestorationMixin.
-class _DatePickerExampleState extends State<DatePickerExample>
-    with RestorationMixin {
-  // In this example, the restoration ID for the mixin is passed in through
-  // the [StatefulWidget]'s constructor.
-  @override
-  String? get restorationId => widget.restorationId;
+class _CalendarState extends State<Calendar> {
+  int nodeIndex = 0;
 
-  final RestorableDateTime _selectedDate =
-      RestorableDateTime(DateTime(2021, 7, 25));
-  late final RestorableRouteFuture<DateTime?> _restorableDatePickerRouteFuture =
-      RestorableRouteFuture<DateTime?>(
-    onComplete: _selectDate,
-    onPresent: (NavigatorState navigator, Object? arguments) {
-      return navigator.restorablePush(
-        _datePickerRoute,
-        arguments: _selectedDate.value.millisecondsSinceEpoch,
-      );
-    },
-  );
-
-  @pragma('vm:entry-point')
-  static Route<DateTime> _datePickerRoute(
-    BuildContext context,
-    Object? arguments,
-  ) {
-    return DialogRoute<DateTime>(
-      context: context,
-      builder: (BuildContext context) {
-        return DatePickerDialog(
-          restorationId: 'date_picker_dialog',
-          initialEntryMode: DatePickerEntryMode.calendarOnly,
-          initialDate: DateTime.fromMillisecondsSinceEpoch(arguments! as int),
-          firstDate: DateTime(2021),
-          lastDate: DateTime(2022),
-        );
-      },
-    );
-  }
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_selectedDate, 'selected_date');
-    registerForRestoration(
-        _restorableDatePickerRouteFuture, 'date_picker_route_future');
-  }
-
-  void _selectDate(DateTime? newSelectedDate) {
-    if (newSelectedDate != null) {
-      setState(() {
-        _selectedDate.value = newSelectedDate;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-              'Selected: ${_selectedDate.value.day}/${_selectedDate.value.month}/${_selectedDate.value.year}'),
-        ));
-      });
+  int indexSetter() {
+    if (nodeIndex > 30) {
+      nodeIndex = 0;
     }
+    nodeIndex += 1;
+    return nodeIndex;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: OutlinedButton(
-          onPressed: () {
-            _restorableDatePickerRouteFuture.present();
-          },
-          child: const Text('Open Date Picker'),
+    return Column(
+      children: <Widget>[
+        const CalendarHeader(),
+        Expanded(
+          child: StaticGrid(
+            columnCount: 7,
+            columnMainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              CalendarNode(calendarIndex: 1, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 2, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 3, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 4, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 5, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 6, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 7, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 1, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 2, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 3, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 4, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 5, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 6, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 7, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 1, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 2, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 3, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 4, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 5, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 6, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 7, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 1, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 2, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 3, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 4, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 5, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 6, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 7, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 1, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 2, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 3, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 4, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 5, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 6, dayNumber: indexSetter()),
+              CalendarNode(calendarIndex: 7, dayNumber: indexSetter()),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Displays all the the Moday - Sunday above the nodes.
+class CalendarHeader extends StatelessWidget {
+  const CalendarHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.labelLarge!.copyWith(
+          color: Colors.black,
+        );
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Text(
+            'Monday',
+            style: style,
+          ),
+          Text(
+            'Tuesday',
+            style: style,
+          ),
+          Text(
+            'Wednesday',
+            style: style,
+          ),
+          Text(
+            'Thursday',
+            style: style,
+          ),
+          Text(
+            'Friday',
+            style: style,
+          ),
+          Text(
+            'Saturday',
+            style: style,
+          ),
+          Text(
+            'Sunday',
+            style: style,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CalendarNode extends StatefulWidget {
+  final int calendarIndex;
+  final int dayNumber;
+  const CalendarNode({
+    Key? key,
+    required this.calendarIndex,
+    required this.dayNumber,
+  }) : super(key: key);
+
+  @override
+  State<CalendarNode> createState() => _CalendarNodeState();
+}
+
+class _CalendarNodeState extends State<CalendarNode> {
+  String appointDayName() {
+    switch (widget.calendarIndex % 7) {
+      case 0:
+        return 'Sunday';
+      case 1:
+        return 'Monday';
+      case 2:
+        return 'Tuesday';
+      case 3:
+        return 'Wednesday';
+      case 4:
+        return 'Thursday';
+      case 5:
+        return 'Friday';
+      case 6:
+        return 'Saturday';
+    }
+    return 'Sunday';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.titleLarge!.copyWith(
+          color: Colors.black,
+        );
+    return Container(
+      height: 100,
+      width: 100,
+      decoration: const BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            width: 1,
+          ),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
+        child: Text(
+          widget.dayNumber.toString(),
+          style: style,
+        ),
+      ),
+    );
+  }
+}
+
+class StaticGrid extends StatelessWidget {
+  const StaticGrid({
+    Key? key,
+    this.columnCount = 2,
+    this.gap,
+    this.padding,
+    this.columnMainAxisAlignment = MainAxisAlignment.start,
+    this.columnCrossAxisAlignment = CrossAxisAlignment.center,
+    this.rowMainAxisAlignment = MainAxisAlignment.start,
+    this.rowCrossAxisAlignment = CrossAxisAlignment.center,
+    required this.children,
+  }) : super(key: key);
+
+  final int columnCount;
+  final double? gap;
+  final EdgeInsets? padding;
+  final MainAxisAlignment columnMainAxisAlignment;
+  final CrossAxisAlignment columnCrossAxisAlignment;
+  final MainAxisAlignment rowMainAxisAlignment;
+  final CrossAxisAlignment rowCrossAxisAlignment;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: columnCrossAxisAlignment,
+        mainAxisAlignment: columnMainAxisAlignment,
+        children: _createRows(),
+      ),
+    );
+  }
+
+  List<Widget> _createRows() {
+    final List<Widget> rows = [];
+    final childrenLength = children.length;
+    final rowCount = (childrenLength / columnCount).ceil();
+
+    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+      final List<Widget> columns = _createCells(rowIndex);
+      rows.add(
+        Row(
+          crossAxisAlignment: rowCrossAxisAlignment,
+          mainAxisAlignment: rowMainAxisAlignment,
+          children: columns,
+        ),
+      );
+      if (rowIndex != rowCount - 1) {
+        rows.add(SizedBox(height: gap));
+      }
+    }
+
+    return rows;
+  }
+
+  List<Widget> _createCells(int rowIndex) {
+    final List<Widget> columns = [];
+    final childrenLength = children.length;
+
+    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+      final cellIndex = rowIndex * columnCount + columnIndex;
+      if (cellIndex <= childrenLength - 1) {
+        columns.add(Expanded(child: children[cellIndex]));
+      } else {
+        columns.add(Expanded(child: Container()));
+      }
+
+      if (columnIndex != columnCount - 1) {
+        columns.add(SizedBox(width: gap));
+      }
+    }
+
+    return columns;
+  }
+}
+
+class EventViewer extends StatefulWidget {
+  const EventViewer({super.key});
+
+  @override
+  State<EventViewer> createState() => _EventViewerState();
+}
+
+class _EventViewerState extends State<EventViewer> {
+  @override
+  Widget build(BuildContext context) {
+    final style = Theme.of(context).textTheme.displaySmall!.copyWith(
+          color: Colors.black,
+        );
+    final style2 = Theme.of(context).textTheme.titleLarge!.copyWith(
+          color: Colors.black,
+        );
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Container(
+        width: 300,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(width: 2),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 0, 14),
+              child: Text(
+                '1',
+                style: style,
+              ),
+            ),
+            Container(
+              height: 2,
+              width: 300,
+              color: Colors.black,
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Text(
+                  'Nothing planned for the day!',
+                  style: style2,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
