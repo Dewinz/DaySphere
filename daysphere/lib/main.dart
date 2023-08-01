@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:daysphere/static_grid.dart';
 
 void main() {
   runApp(const MyApp());
@@ -106,7 +107,7 @@ class _CalendarState extends State<Calendar> {
   }
 }
 
-// Displays all the the Moday - Sunday above the nodes.
+// Displays all the the Monday - Sunday above the nodes.
 class CalendarHeader extends StatelessWidget {
   const CalendarHeader({super.key});
 
@@ -193,101 +194,29 @@ class _CalendarNodeState extends State<CalendarNode> {
     final style = Theme.of(context).textTheme.titleLarge!.copyWith(
           color: Colors.black,
         );
-    return Container(
-      height: 100,
-      width: 100,
-      decoration: const BoxDecoration(
-        border: Border(
-          top: BorderSide(
-            width: 1,
+    return GestureDetector(
+      onTap: () {
+        _EventViewerState().changeEventView(widget.dayNumber, appointDayName());
+      },
+      child: Container(
+        height: 100,
+        width: 100,
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              width: 1,
+            ),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
+          child: Text(
+            widget.dayNumber.toString(),
+            style: style,
           ),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 8, 0, 0),
-        child: Text(
-          widget.dayNumber.toString(),
-          style: style,
-        ),
-      ),
     );
-  }
-}
-
-class StaticGrid extends StatelessWidget {
-  const StaticGrid({
-    Key? key,
-    this.columnCount = 2,
-    this.gap,
-    this.padding,
-    this.columnMainAxisAlignment = MainAxisAlignment.start,
-    this.columnCrossAxisAlignment = CrossAxisAlignment.center,
-    this.rowMainAxisAlignment = MainAxisAlignment.start,
-    this.rowCrossAxisAlignment = CrossAxisAlignment.center,
-    required this.children,
-  }) : super(key: key);
-
-  final int columnCount;
-  final double? gap;
-  final EdgeInsets? padding;
-  final MainAxisAlignment columnMainAxisAlignment;
-  final CrossAxisAlignment columnCrossAxisAlignment;
-  final MainAxisAlignment rowMainAxisAlignment;
-  final CrossAxisAlignment rowCrossAxisAlignment;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: padding,
-      child: Column(
-        crossAxisAlignment: columnCrossAxisAlignment,
-        mainAxisAlignment: columnMainAxisAlignment,
-        children: _createRows(),
-      ),
-    );
-  }
-
-  List<Widget> _createRows() {
-    final List<Widget> rows = [];
-    final childrenLength = children.length;
-    final rowCount = (childrenLength / columnCount).ceil();
-
-    for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-      final List<Widget> columns = _createCells(rowIndex);
-      rows.add(
-        Row(
-          crossAxisAlignment: rowCrossAxisAlignment,
-          mainAxisAlignment: rowMainAxisAlignment,
-          children: columns,
-        ),
-      );
-      if (rowIndex != rowCount - 1) {
-        rows.add(SizedBox(height: gap));
-      }
-    }
-
-    return rows;
-  }
-
-  List<Widget> _createCells(int rowIndex) {
-    final List<Widget> columns = [];
-    final childrenLength = children.length;
-
-    for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-      final cellIndex = rowIndex * columnCount + columnIndex;
-      if (cellIndex <= childrenLength - 1) {
-        columns.add(Expanded(child: children[cellIndex]));
-      } else {
-        columns.add(Expanded(child: Container()));
-      }
-
-      if (columnIndex != columnCount - 1) {
-        columns.add(SizedBox(width: gap));
-      }
-    }
-
-    return columns;
   }
 }
 
@@ -299,6 +228,12 @@ class EventViewer extends StatefulWidget {
 }
 
 class _EventViewerState extends State<EventViewer> {
+  String eventView = 'No day selected';
+
+  void changeEventView(dayNumber, dayName) {
+    eventView = '$dayNumber $dayName';
+  }
+
   @override
   Widget build(BuildContext context) {
     final style = Theme.of(context).textTheme.displaySmall!.copyWith(
@@ -321,7 +256,7 @@ class _EventViewerState extends State<EventViewer> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 10, 0, 14),
               child: Text(
-                '1',
+                eventView,
                 style: style,
               ),
             ),
@@ -334,7 +269,7 @@ class _EventViewerState extends State<EventViewer> {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Text(
-                  'Nothing planned for the day!',
+                  'Nothing planned for the day',
                   style: style2,
                 ),
               ),
