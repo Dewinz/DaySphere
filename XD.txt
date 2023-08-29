@@ -1,0 +1,30 @@
+import speech_recognition as sr
+r = sr.Recognizer()
+
+class VR:
+    def Record():
+        with sr.Microphone() as source:
+            print("Adjusting")
+            r.adjust_for_ambient_noise(source, 0.2)
+            print("Listening...")
+            return r.listen(source)
+        
+
+    def Recognize(audio):
+        print("Processing...")
+        try:
+            text=r.recognize_whisper(audio, "base", False, None, "english", False)
+            if "key word" in str(text).lower(): print("Keyword found") 
+            else: print("No keyword")
+            print("Recognized text: " + text)
+        except sr.UnknownValueError:
+            print("Speech recognition could not understand audio")
+        except sr.RequestError as e:
+            print("Could not request results from the speech recognition service; {0}".format(e))
+
+    def main():
+        while True:
+            audio = VR.Record()
+            VR.Recognize(audio)
+
+if __name__ == "__main__": VR.main()
