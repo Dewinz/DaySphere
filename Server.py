@@ -26,8 +26,7 @@ def primefiller():
     return prime
  
 def pickrandomprime():
-    """Picking a random prime number and erasing that prime number from list because p!=q
-    """
+    """Picking a random prime number and erasing that prime number from list because p!=q."""
     prime = primefiller()
     k = randint(0, len(prime) - 1)
     it = iter(prime)
@@ -41,8 +40,7 @@ def pickrandomprime():
  
 def setkeys():
     """Set the keys for the RSA encryption algorhithm
-    See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/
-    """
+    See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/."""
 
     prime1 = pickrandomprime()  # First prime number
     prime2 = pickrandomprime()  # Second prime number
@@ -68,7 +66,7 @@ def setkeys():
 
 
 def decrypt(keys:[int, int], encrypted_number:int|float):
-    """Decrypts an encrypted integer/float using a private key and additional number"""
+    """Decrypts an encrypted integer/float using a private key and additional number."""
 
     decrypted = 1
     while keys[0] > 0:
@@ -78,7 +76,7 @@ def decrypt(keys:[int, int], encrypted_number:int|float):
     return decrypted
  
 def decoder(keys:[int, int], encoded_text:list):
-    """Decodes a list of encrypted ascii numbers of letters using a private key and an additional number"""
+    """Decodes a list of encrypted ascii numbers of letters using a private key and an additional number."""
 
     s = ''
     # Calling the decrypting function decoding function
@@ -87,7 +85,7 @@ def decoder(keys:[int, int], encoded_text:list):
     return s
 
 def createacc(User:str, Pass:str):
-    """Adds a new account to userpass.json"""
+    """Adds a new account to userpass.json."""
 
     with open('userpass.json') as file:
         userpass = json.load(file)
@@ -98,14 +96,14 @@ def createacc(User:str, Pass:str):
         json.dump(userpass, file)
 
 def reqkey(User:str) -> [int, int]:
-    """Function to request a public key and additional number"""
+    """Function to request a public key and additional number."""
 
     with open('userpass.json') as file:
         userpass = json.load(file)
     return userpass[User][1:3:1]
 
 def login(User:str, encpass:list) -> bool:
-    """Attempts a login"""
+    """Attempts a login."""
     
     with open('userpass.json') as file:
         userpass = json.load(file)

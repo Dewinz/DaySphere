@@ -1,32 +1,16 @@
 import customtkinter
+from client import login
 
 # Notes:
-# login() and admin_login() are currently being used as the placeholder command to log in.
-# Either change function called in Buttons or repurpose login() and admin_login()
-
 # remembered is the variable to determine if client side should immediately go to StartPage or LoginPageFrame.
 # remembered should be changed to read a json file to immediately log in.
 remembered = False
 # Currently breaks the StartPage layout on True.
 
+# Right now if login() were to fail it'll throw an exception, this would need to be caught and used in a label as error on GUI.
+
 
 # ============ Back-End ============
-# Handles the basic login logic.
-def login(master, username, password):
-    username_answer = "Dewinz"
-    password_answer = "Balls4Walls"
-    
-    print(f"User log in attempted with parameters.\nUsername: {username}\nPassword: {password}")
-    if username == username_answer and password == password_answer:
-        master.switch_view(StartPage)
-        
-    elif username == username_answer and password != password_answer:
-        # Preferably change this to be a label.
-        print("Incorrect Password")
-        
-    else:
-        print("Incorrect Username")
-
 
 # (TEMPORARY) login logic to bypass username and password.
 def admin_login(master):
@@ -143,7 +127,8 @@ class LoginPage(customtkinter.CTkFrame):
 
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
-        self.login_button = customtkinter.CTkButton(self, text="Log in", command=lambda: login(master.master, self.user_entry.get(), self.pass_entry.get()))
+        self.login_button = customtkinter.CTkButton(self, text="Log in",
+                                                    command=lambda: master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get()) else print("Should be an error label."))
         self.login_button.grid(row=5, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
