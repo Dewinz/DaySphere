@@ -1,70 +1,233 @@
-# TODO 
-# Make function page (undetermined).
-# Check is regular tkinter can be altered into a modern look. (Since CTk and Tk should be interchangeable.)
-#   If so try to modernize this example: https://www.geeksforgeeks.org/python-gui-calendar-using-tkinter/
+import customtkinter
 
 # Notes:
 # login() and admin_login() are currently being used as the placeholder command to log in.
 # Either change function called in Buttons or repurpose login() and admin_login()
 
+# remembered is the variable to determine if client side should immediately go to StartPage or LoginPageFrame.
+# remembered should be changed to read a json file to immediately log in.
+remembered = False
+# Currently breaks the StartPage layout on True.
 
-import customtkinter
 
-def login(username, password):
+# ============ Back-End ============
+# Handles the basic login logic.
+def login(master, username, password):
+    username_answer = "Dewinz"
+    password_answer = "Balls4Walls"
+    
     print(f"User log in attempted with parameters.\nUsername: {username}\nPassword: {password}")
+    if username == username_answer and password == password_answer:
+        master.switch_view(StartPage)
+        
+    elif username == username_answer and password != password_answer:
+        # Preferably change this to be a label.
+        print("Incorrect Password")
+        
+    else:
+        print("Incorrect Username")
 
-def admin_login():
+
+# (TEMPORARY) login logic to bypass username and password.
+def admin_login(master):
     print("Admin log in attempted")
+    master.switch_view(StartPage)
+    
 
 # Parameters cannot be passed through since it'll only run the function once then.
 # Therefore we are using a global variable to get the value.
 # Preferably this would be changed to be integrated into the class so that it doesn't needlessly take memory.
-boxState = False
+box_state = False
 def checkbox_event():
-        global boxState
-        if boxState : boxState = False
-        else : boxState = True
-        print(boxState)
+    global box_state
+    if box_state : box_state = False
+    else : box_state = True
+    print(box_state)
+        
+
+# Logic that handles account creation.
+def create_account(master, username, password, ver_password):
+    # Change with account creation code.
+    # Here is some boilerplate code of what it should do.
+    existing_names = "Dewinz"
+    if username == existing_names:
+        print("There is already an account with this name.")
+        
+    elif password == ver_password:
+        print("Account made.")
+        master.switch_view(StartPage)
+    
+    else:
+        print("Passwords don't match.")
 
 
-
-# App class defines everything that will be displayed.
+# =========== Front-End ===========
 class App(customtkinter.CTk):
     def __init__(self):
-        super().__init__()  
-        self.title("DaySphere")
+        super().__init__()
+        
         # Defines the on boot up resolution, would like to change it to be dynamic based off of previous session.
         # AKA if closed on second screen while windowed last session, keep it the same on next startup.
         self.geometry("1000x750")
 
-        self.label = customtkinter.CTkLabel(self, text="", fg_color="transparent")    
-        self.label.pack(padx=20, pady=120)
+        # Define a private variable which contains the view.
+        self._view = None
+        
+        # If you picked "remember me" on last sesssion while logging in immediately try to log in.
+        # It currently will immediately go to StartPage.
+        # But it should first actually try to log in by the server, then go to the StartPage.
+        if remembered : self.switch_view(StartPage)
+        else : self.switch_view(LoginPageFrame)
+        
 
+    def switch_view(self, view):
+        # Destroys current frame and replaces it with a new one.
+        new_view = view(self)
+        if self._view is not None:
+            self._view.destroy()
+        self._view = new_view
+        
+        # Makes it so the frame (which we call view) is allowed to take up the entire screen.
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        # Rewrites the view onto the screen.
+        # Sticky makes the view take up the entire screen.
+        self._view.grid(sticky="nesw")
+
+
+# A placeholder for the "startpage".
+class StartPage(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master)
+        
+        # TODO
+        # Fix the login_menu_button to the very bottom left corner.
+        
+        self.login_menu_button = customtkinter.CTkButton(self, text="Go back to login", command=lambda: master.switch_view(LoginPageFrame))
+        self.login_menu_button.grid(row=10, column=0, padx=8, pady=8, sticky="sw")
+        
+        self.button1 = customtkinter.CTkButton(self, text="Open page one", command=lambda: master.switch_view(LoginPageFrame))
+        self.button1.grid(row=1, column=1, padx=20, pady=8)
+        
+        self.button2 = customtkinter.CTkButton(self, text="Open page two", command=lambda: master.switch_view(PageTwo))
+        self.button2.grid(row=5, column=1, padx=20, pady=8)
+
+
+# The first screen you see on startup.
+# Preferably changed if "remembered" was True (with user account).
+class LoginPage(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master)
+        
+        # TODO
+        # Add labels above entries that display "Username:" and "Password:"
+        
+        # Displays "Log in" text.
+        self.login_label = customtkinter.CTkLabel(self, text="Log in", font=customtkinter.CTkFont(self, size=20))
+        self.login_label.grid(row=1, column=0, padx=20, pady=(20, 0))
+        
         # Entry that takes in the username info.
-        self.userEntry = customtkinter.CTkEntry(self, placeholder_text="Username")
-        self.userEntry.pack(padx=20, pady=8)
+        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="Username")
+        self.user_entry.grid(row=2, column=0, padx=20, pady=(20, 8))
 
         # Entry that takes in the password info.
-        self.passEntry = customtkinter.CTkEntry(self, placeholder_text="Password")
-        self.passEntry.pack(padx=20, pady=8)
+        self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="Password")
+        self.pass_entry.grid(row=3, column=0, padx=20, pady=8)
 
         # Checkbox to find whether the log in information should be saved.
-        # checkBoxState should be in the same state as boxState.
-        checkBoxState = customtkinter.StringVar(value="off")
-        self.rememberMeCheckBox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=checkBoxState, onvalue="on", offvalue="off")
-        self.rememberMeCheckBox.pack(padx= 12, pady=12)
+        # check_box_state should be in the same state as box_state.
+        check_box_state = customtkinter.StringVar(value="off")
+        self.remember_me_checkbox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=check_box_state, onvalue="on", offvalue="off")
+        self.remember_me_checkbox.grid(row=4, column=0, padx= 12, pady=12)
 
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
-        self.loginButton = customtkinter.CTkButton(self, text="Log in", command=lambda: login(self.userEntry.get(), self.passEntry.get()))
-        self.loginButton.pack(padx=20, pady=8)
+        self.login_button = customtkinter.CTkButton(self, text="Log in", command=lambda: login(master.master, self.user_entry.get(), self.pass_entry.get()))
+        self.login_button.grid(row=5, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
-        self.adminButton = customtkinter.CTkButton(self, text="Admin Log in", command=admin_login)
-        self.adminButton.pack(padx=20, pady=8)
+        self.login_button = customtkinter.CTkButton(self, text="Admin Log in", command=lambda: admin_login(master.master))
+        self.login_button.grid(row=6, column=0, padx=20, pady=8)
+        
+        # Create account button.
+        self.acc_creation_menu_button = customtkinter.CTkButton(self, text="Create account", command=lambda: master.master.switch_view(AccountCreationPageFrame),
+                                                             fg_color="transparent", hover_color="green")
+        self.acc_creation_menu_button.grid(row=7, column=0, padx=20, pady=(12, 20))
+        
+
+# Boxes our view LoginPageFrame into a nice Frame, which is the border containing all LoginPage elements.
+# So the Frame takes up the entire view, and the LoginPage is centered inside.
+# LoginPage's parent is LoginPageFrame, therefore master.master is used in LoginPage.
+class LoginPageFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        self.login_page_view = LoginPage(self)
+        self.login_page_view.grid(row=0, column=0)
+        
+        
+# Page for everything account creation.
+class AccountCreationPage(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master)
+        
+        # Displays "Account Creation" text.
+        self.acc_creation_label = customtkinter.CTkLabel(self, text="Account Creation", font=customtkinter.CTkFont(self, size=20))
+        self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
+        
+        # Entry that takes in the username info.
+        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="Username")
+        self.user_entry.grid(row=1, column=0, padx=20, pady=(20, 8))
+
+        # Entry that takes in the password info.
+        self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="Password")
+        self.pass_entry.grid(row=2, column=0, padx=20, pady=8)
+        
+        # Entry that takes in the password info again to verify.
+        self.pass_ver_entry = customtkinter.CTkEntry(self, placeholder_text="Verify password")
+        self.pass_ver_entry.grid(row=3, column=0, padx=20, pady=8)
+        
+        # Checkbox to find whether the log in information should be saved.
+        # check_box_state should be in the same state as box_state.
+        check_box_state = customtkinter.StringVar(value="off")
+        self.remember_me_checkbox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=check_box_state, onvalue="on", offvalue="off")
+        self.remember_me_checkbox.grid(row=4, column=0, padx= 12, pady=12)
+        
+        # Button that will call the logic to make an account.
+        self.create_account_button = customtkinter.CTkButton(self, text="Create Account",
+                                                             command=lambda: create_account(master.master, self.user_entry.get(), self.pass_entry.get(), self.pass_ver_entry.get()))
+        self.create_account_button.grid(row=5, column=0, padx=20, pady=(8, 8))
+        
+        # Button to go back to login view.
+        self.go_back_to_login_button = customtkinter.CTkButton(self, text="Go back", command=lambda: master.master.switch_view(LoginPageFrame),
+                                                               fg_color="transparent", hover_color="red")
+        self.go_back_to_login_button.grid(row=6, column=0, padx=20, pady=(12,20))
 
 
-# Defines an instance of the app class and runs it.
-# The class can not be run on it's own, it needs to be initialized.
-app = App()
-app.mainloop()
+# Boxes our view AccountCreationPage into a nice Frame, which is the border containing all LoginPage elements.
+# So the Frame takes up the entire view, and the AccountCreationPage is centered inside.
+# AccountCreationPage's parent is AccountCreationPageFrame, therefore master.master is used in AccountCreationPage.
+class AccountCreationPageFrame(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        self.account_creation_page = AccountCreationPage(self)
+        self.account_creation_page.grid(row=0, column=0)
+        
+
+class PageTwo(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master)
+        customtkinter.CTkLabel(self, text="This is page two").pack(side="top", fill="x", pady=10)
+        customtkinter.CTkButton(self, text="Return to start page", command=lambda: master.switch_view(StartPage)).pack()
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
