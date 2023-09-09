@@ -1,6 +1,11 @@
 import customtkinter
 from client import login
 
+# TODO
+# Refactor the naming to more concise.
+# For example the LoginPage isn't really a page but a menu.
+# It's parent, LoginPageFrame however is a page.
+
 # Notes:
 # remembered is the variable to determine if client side should immediately go to StartPage or LoginPageFrame.
 # remembered should be changed to read a json file to immediately log in.
@@ -16,7 +21,7 @@ remembered = False
 def admin_login(master):
     print("Admin log in attempted")
     master.switch_view(StartPage)
-    
+
 
 # Parameters cannot be passed through since it'll only run the function once then.
 # Therefore we are using a global variable to get the value.
@@ -77,7 +82,10 @@ class App(customtkinter.CTk):
         
         # Rewrites the view onto the screen.
         # Sticky makes the view take up the entire screen.
-        self._view.grid(sticky="nesw")
+        if view == StartPage:
+            self._view.grid(sticky="nesw")
+        else:
+            self._view.grid(sticky="nesw")
 
 
 # A placeholder for the "startpage".
@@ -88,8 +96,11 @@ class StartPage(customtkinter.CTkFrame):
         # TODO
         # Fix the login_menu_button to the very bottom left corner.
         
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
         self.login_menu_button = customtkinter.CTkButton(self, text="Go back to login", command=lambda: master.switch_view(LoginPageFrame))
-        self.login_menu_button.grid(row=10, column=0, padx=8, pady=8, sticky="sw")
+        self.login_menu_button.grid(column=0, padx=8, pady=8, sticky="sw")
         
         self.button1 = customtkinter.CTkButton(self, text="Open page one", command=lambda: master.switch_view(LoginPageFrame))
         self.button1.grid(row=1, column=1, padx=20, pady=8)
