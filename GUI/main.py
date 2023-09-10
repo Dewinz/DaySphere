@@ -1,5 +1,5 @@
 import customtkinter
-from client import login
+from communication.client import login
 
 # TODO
 # Refactor the naming to more concise.
@@ -224,6 +224,5 @@ class PageTwo(customtkinter.CTkFrame):
         customtkinter.CTkLabel(self, text="This is page two").pack(side="top", fill="x", pady=10)
         customtkinter.CTkButton(self, text="Return to start page", command=lambda: master.switch_view(StartPage)).pack()
 
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
+app = App()
+app.mainloop()

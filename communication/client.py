@@ -1,4 +1,4 @@
-import server
+import communication.server
 
 User="Gopi"
 Pass="!Walls4balls"
@@ -26,7 +26,7 @@ def login(User:str, Pass:str) -> bool:
     """Attempts a login"""
 
     global Loggedin
-    Loggedin = server.login(User, encoder(server.reqkey(User), Pass))
+    Loggedin = communication.server.login(User, encoder(communication.server.reqkey(User), Pass))
     if not Loggedin: raise ValueError("Password or username was incorrect.")
     return True
 
@@ -37,7 +37,7 @@ def adminlogin():
     Loggedin = True
 
     
-
-server.createacc(User, Pass)
-login(User, Pass)
-print(Loggedin)
+if __name__ == "__main__":
+    communication.server.createacc(User, Pass)
+    login(User, Pass)
+    print(Loggedin)
