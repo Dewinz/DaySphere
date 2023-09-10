@@ -1,6 +1,11 @@
 from random import randint
 from math import gcd
 import json
+import socket
+
+HOST = socket.gethostbyname(socket.gethostname())
+PORT = 25565
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def primefiller():
     """Returns a set filled with prime numbers. May replace since it doesn't quite work the way i want it to."""
@@ -100,12 +105,37 @@ def reqkey(User:str) -> [int, int]:
 
     with open('userpass.json') as file:
         userpass = json.load(file)
-    return userpass[User][1:3:1]
+    try: return userpass[User][1:3:1]
+    except KeyError: return KeyError
 
 def login(User:str, encpass:list) -> bool:
     """Attempts a login."""
     
     with open('userpass.json') as file:
         userpass = json.load(file)
-    return decoder(userpass[User][0:3:2], encpass) == userpass[User][3]
     
+    try: return decoder(userpass[User][0:3:2], encpass) == userpass[User][3]
+    except: return False
+
+
+
+s.bind((HOST, PORT))
+s.listen()
+print(f"Listening on ip: {HOST}:{PORT}")
+conn, addr = s.accept()
+with conn:
+    while True:
+        data = conn.recv(1024).decode('UTF-8')
+        if data:
+            print(data)
+            datal = data.split(" ")
+            match datal[0]:
+                case "func->list":
+                    exec (f"try: [conn.sendall(str(i).encode(\"UTF-8\")) for i in {datal[1]}]\nexcept: conn.sendall(str({datal[1]}).encode(\"UTF-8\"))")
+                case "func->nonit":
+                    exec ("conn.sendall(str({}).encode(\"UTF-8\"))".format(datal[1]))
+                case "func->None":
+                    exec (datal[1])
+                case "close":
+                    s.close
+                    break

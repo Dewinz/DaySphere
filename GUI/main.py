@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login
+from communication.client import login, create_account
 
 # TODO
 # Refactor the naming to more concise.
@@ -32,22 +32,6 @@ def checkbox_event():
     if box_state : box_state = False
     else : box_state = True
     print(box_state)
-        
-
-# Logic that handles account creation.
-def create_account(master, username, password, ver_password):
-    # Change with account creation code.
-    # Here is some boilerplate code of what it should do.
-    existing_names = "Dewinz"
-    if username == existing_names:
-        print("There is already an account with this name.")
-        
-    elif password == ver_password:
-        print("Account made.")
-        master.switch_view(StartPage)
-    
-    else:
-        print("Passwords don't match.")
 
 
 # =========== Front-End ===========
@@ -195,7 +179,7 @@ class AccountCreationPage(customtkinter.CTkFrame):
         
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account",
-                                                             command=lambda: create_account(master.master, self.user_entry.get(), self.pass_entry.get(), self.pass_ver_entry.get()))
+                                                             command=lambda: create_account(self.user_entry.get(), self.pass_entry.get()))
         self.create_account_button.grid(row=5, column=0, padx=20, pady=(8, 8))
         
         # Button to go back to login view.

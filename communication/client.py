@@ -1,8 +1,19 @@
-import communication.server
+import socket
+
+# Server ip: 84.105.126.31
+# Gopi ip: 84.105.39.48
+HOST = "84.105.126.31"  # The server's hostname or IP address
+PORT = 5050  # The port used by the server
 
 User="Gopi"
 Pass="!Walls4balls"
 Loggedin=False
+
+Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+Sendsocket.connect((HOST, PORT))
+
+def receive():
+    return Sendsocket.recv(1024).decode("UTF-8")
 
 def encrypt(keys:[int, int], message:int|float) -> int:
     """Encrypts a number using a public key and an additional number."""
@@ -26,7 +37,18 @@ def login(User:str, Pass:str) -> bool:
     """Attempts a login"""
 
     global Loggedin
-    Loggedin = communication.server.login(User, encoder(communication.server.reqkey(User), Pass))
+    try:
+        Sendsocket.sendall(f"func->list reqkey(\"{User}\")".encode('UTF-8'))
+        keys = [int(receive()), int(receive())]
+
+        encoded = f"{encoder(keys,Pass)!r}".replace(" ", "")
+
+        Sendsocket.sendall(f"func->nonit login(\"{User}\",{encoded})".encode("UTF-8"))
+        Loggedin = receive() == "True"
+        print(Loggedin)
+    except:
+        pass
+
     if not Loggedin: raise ValueError("Password or username was incorrect.")
     return True
 
@@ -36,8 +58,12 @@ def adminlogin():
     global Loggedin
     Loggedin = True
 
-    
+def create_account(User, Pass):
+    """Creates a new user account and adds it to userpass.json"""
+
+    Sendsocket.sendall(f"func->None createacc(\"{User}\",\"{Pass}\")".encode('UTF-8'))
+
 if __name__ == "__main__":
-    communication.server.createacc(User, Pass)
     login(User, Pass)
-    print(Loggedin)
+    print(f"Loggedin {Loggedin!r}")
+    Sendsocket.sendall(b"close")
