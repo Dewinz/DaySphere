@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login, create_account
+from communication.client import login, create_account, save_remember_me
 
 # TODO
 # Refactor the naming to more concise.
@@ -123,7 +123,9 @@ class LoginPage(customtkinter.CTkFrame):
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
         self.login_button = customtkinter.CTkButton(self, text="Log in",
-                                                    command=lambda: master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get()) else print("Should be an error label."))
+                                                    command=lambda: [save_remember_me(box_state),
+                                                                     master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get())
+                                                                     else master.error_label.grid(row=1, column=0)])
         self.login_button.grid(row=5, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
@@ -149,7 +151,9 @@ class LoginPageFrame(customtkinter.CTkFrame):
         self.login_page_view = LoginPage(self)
         self.login_page_view.grid(row=0, column=0)
         
-        
+        self.error_label = ErrorLabel(self)
+
+
 # Page for everything account creation.
 class AccountCreationPage(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -179,7 +183,8 @@ class AccountCreationPage(customtkinter.CTkFrame):
         
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account",
-                                                             command=lambda: create_account(self.user_entry.get(), self.pass_entry.get()))
+                                                             command=lambda: master.master.switch_view(StartPage)
+                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else master.error_label.grid(row=1, column=0))
         self.create_account_button.grid(row=5, column=0, padx=20, pady=(8, 8))
         
         # Button to go back to login view.
@@ -201,6 +206,22 @@ class AccountCreationPageFrame(customtkinter.CTkFrame):
         self.account_creation_page = AccountCreationPage(self)
         self.account_creation_page.grid(row=0, column=0)
         
+        self.error_label = ErrorLabel(self)
+
+
+class ErrorLabel(customtkinter.CTkFrame):
+    def __init__(self, master):
+        customtkinter.CTkFrame.__init__(self, master, fg_color="red", border_width=8, border_color="black")
+        
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        
+        # TODO
+        # Change it to also have proper text="" for account creation.
+        # Beautify in general.
+        self.error_label = customtkinter.CTkLabel(self, text="Wrong username or password.")
+        self.error_label.grid(row=0, column=0)
+
 
 class PageTwo(customtkinter.CTkFrame):
     def __init__(self, master):

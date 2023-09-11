@@ -7,7 +7,7 @@ HOST = "192.168.178.2"
 PORT = 5050
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def primefiller():
+def prime_filler():
     """Returns a set filled with prime numbers. May replace since it doesn't quite work the way i want it to."""
     # A set will be the collection of prime numbers,
     # where we can select random primes p and q
@@ -30,9 +30,9 @@ def primefiller():
     
     return prime
  
-def pickrandomprime():
+def pick_random_prime():
     """Picking a random prime number and erasing that prime number from list because p!=q."""
-    prime = primefiller()
+    prime = prime_filler()
     k = randint(0, len(prime) - 1)
     it = iter(prime)
     for _ in range(k):
@@ -43,12 +43,12 @@ def pickrandomprime():
     return ret
  
  
-def setkeys():
+def set_keys():
     """Set the keys for the RSA encryption algorhithm
     See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/."""
 
-    prime1 = pickrandomprime()  # First prime number
-    prime2 = pickrandomprime()  # Second prime number
+    prime1 = pick_random_prime()  # First prime number
+    prime2 = pick_random_prime()  # Second prime number
  
     n = prime1 * prime2
     fi = (prime1 - 1) * (prime2 - 1)
@@ -89,18 +89,18 @@ def decoder(keys:[int, int], encoded_text:list):
         s += chr(decrypt([keys[0], keys[1]], num))
     return s
 
-def createacc(User:str, Pass:str):
+def create_account(User:str, Pass:str):
     """Adds a new account to userpass.json."""
 
     with open('userpass.json') as file:
         userpass = json.load(file)
-    keys = list(setkeys())
+    keys = list(set_keys())
     keys.append(Pass)
     userpass[User] = keys
     with open('userpass.json', "w") as file:
         json.dump(userpass, file)
 
-def reqkey(User:str) -> [int, int]:
+def request_key(User:str) -> [int, int]:
     """Function to request a public key and additional number."""
 
     with open('userpass.json') as file:
