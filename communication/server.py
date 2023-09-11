@@ -3,8 +3,8 @@ from math import gcd
 import json
 import socket
 
-HOST = socket.gethostbyname(socket.gethostname())
-PORT = 25565
+HOST = "192.168.178.2"
+PORT = 5050
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 def primefiller():
@@ -124,10 +124,10 @@ s.listen()
 print(f"Listening on ip: {HOST}:{PORT}")
 conn, addr = s.accept()
 with conn:
+    print(f"Connected by {addr}")
     while True:
         data = conn.recv(1024).decode('UTF-8')
         if data:
-            print(data)
             datal = data.split(" ")
             match datal[0]:
                 case "func->list":
