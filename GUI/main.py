@@ -1,5 +1,7 @@
 import customtkinter
 from communication.client import login, create_account, save_remember_me
+# # Commented out since Pillow can't be installed into the venv.
+# from PIL import Image
 
 # TODO
 # Refactor the naming to more concise.
@@ -32,6 +34,19 @@ def checkbox_event():
     if box_state : box_state = False
     else : box_state = True
     print(box_state)
+
+
+# # Commented out since Pillow can't be installed into the venv.
+# # Toggles the password the password between hidden and shown.
+# def toggle_hidden(app_instance):
+#     if app_instance.pass_entry.cget('show') == '':
+#         app_instance.pass_entry.configure(show='*')
+#         app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
+#                                                                              dark_image=Image.open("assets/hidden_black.png")))
+#     else:
+#         app_instance.pass_entry.configure(show='')
+#         app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/open_white.png"),
+#                                                                              dark_image=Image.open("assets/open_black.png")))
 
 
 # =========== Front-End ===========
@@ -120,6 +135,15 @@ class LoginPage(customtkinter.CTkFrame):
         self.remember_me_checkbox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=check_box_state, onvalue="on", offvalue="off")
         self.remember_me_checkbox.grid(row=4, column=0, padx= 12, pady=12)
 
+
+        # # Commented out since Pillow can't be installed into the venv.
+        # # Button that toggles if the password is shown or hidden.
+        # self.hide_pass_button = customtkinter.CTkButton(self, text="", width=0, command=lambda: toggle_hidden(self),
+        #                                                 image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
+        #                                                                              dark_image=Image.open("assets/hidden_black.png")),
+        #                                                                              fg_color="transparent")
+        # self.hide_pass_button.grid(row=4, column=0, padx=4, sticky="e")
+        
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
         self.login_button = customtkinter.CTkButton(self, text="Log in",
@@ -179,7 +203,7 @@ class AccountCreationPage(customtkinter.CTkFrame):
         # check_box_state should be in the same state as box_state.
         check_box_state = customtkinter.StringVar(value="off")
         self.remember_me_checkbox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=check_box_state, onvalue="on", offvalue="off")
-        self.remember_me_checkbox.grid(row=4, column=0, padx= 12, pady=12)
+        self.remember_me_checkbox.grid(row=4, column=0, padx=20, pady=12, sticky="w")
         
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account",
