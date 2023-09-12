@@ -31,9 +31,10 @@ def admin_login(master):
 box_state = False
 def checkbox_event():
     global box_state
+    # TODO
+    # Change the remember me checkbox to the corresponding state, this should also be done on startup of the loginpage.
     if box_state : box_state = False
     else : box_state = True
-    print(box_state)
 
 
 # # Commented out since Pillow can't be installed into the venv.
@@ -183,6 +184,9 @@ class AccountCreationPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master)
         
+        # TODO
+        # Make the create_account_button be disabled at all times unless all fields are filled in and the passwords match.
+
         # Displays "Account Creation" text.
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Account Creation", font=customtkinter.CTkFont(self, size=20))
         self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
