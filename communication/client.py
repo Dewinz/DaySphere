@@ -13,7 +13,7 @@ Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # TODO
 # Should become threaded so it doesn't block GUI from running.
 try: Sendsocket.connect((HOST, PORT))
-except Exception: print(Exception)
+except: print("Could not connect to server.")
 
 Loggedin = False
 

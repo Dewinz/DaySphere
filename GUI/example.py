@@ -1,18 +1,28 @@
-import asyncio
+import tkinter as tk
 
-async def tcp_echo_client(message):
-    reader, writer = await asyncio.open_connection(
-        '192.168.178.2', 5050)
+root = tk.Tk()
 
-    print(f'Send: {message!r}')
-    writer.write(message.encode())
-    await writer.drain()
+def move_window(event):
+    root.geometry('+{0}+{1}'.format(event.x_root, event.y_root))
 
-    data = await reader.read(100)
-    print(f'Received: {data.decode()!r}')
+root.overrideredirect(True) # turns off title bar, geometry
+root.geometry('400x100+200+200') # set new geometry
 
-    print('Close the connection')
-    writer.close()
-    await writer.wait_closed()
+# make a frame for the title bar
+title_bar = tk.Frame(root, bg='blue', relief='raised', bd=2) # enter your colour here
 
-asyncio.run(tcp_echo_client('Hello World!'))
+# put a close button on the title bar
+close_button = tk.Button(title_bar, text='X', command=root.destroy)
+
+# a canvas for the main area of the window
+window = tk.Canvas(root, bg='black')
+
+# pack the widgets
+title_bar.pack(expand=1, fill="x")
+close_button.pack(side="right")
+window.pack(expand=1, fill="both")
+
+# bind title bar motion to the move window function
+title_bar.bind('<B1-Motion>', move_window)
+
+root.mainloop()

@@ -1,20 +1,20 @@
 import customtkinter
 from communication.client import login, create_account, save_remember_me
-# # Commented out since Pillow can't be installed into the venv.
-# from PIL import Image
+from PIL import ImageTk, Image
+import os
 
 # TODO
 # Refactor the naming to more concise.
+# - StartPage should be MainPage.
 # For example the LoginPage isn't really a page but a menu.
 # It's parent, LoginPageFrame however is a page.
+# Accessibility page?
+# Backgrounds?
 
 # Notes:
 # remembered is the variable to determine if client side should immediately go to StartPage or LoginPageFrame.
 # remembered should be changed to read a json file to immediately log in.
-remembered = False
-# Currently breaks the StartPage layout on True.
-
-# Right now if login() were to fail it'll throw an exception, this would need to be caught and used in a label as error on GUI.
+remembered = True
 
 
 # ============ Back-End ============
@@ -37,23 +37,30 @@ def checkbox_event():
     else : box_state = True
 
 
-# # Commented out since Pillow can't be installed into the venv.
-# # Toggles the password the password between hidden and shown.
-# def toggle_hidden(app_instance):
-#     if app_instance.pass_entry.cget('show') == '':
-#         app_instance.pass_entry.configure(show='*')
-#         app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
-#                                                                              dark_image=Image.open("assets/hidden_black.png")))
-#     else:
-#         app_instance.pass_entry.configure(show='')
-#         app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/open_white.png"),
-#                                                                              dark_image=Image.open("assets/open_black.png")))
+# Toggles the password the password between hidden and shown.
+def toggle_hidden(app_instance):
+    if app_instance.pass_entry.cget('show') == '':
+        app_instance.pass_entry.configure(show='*')
+        app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
+                                                                             dark_image=Image.open("assets/hidden_black.png")))
+    else:
+        app_instance.pass_entry.configure(show='')
+        app_instance.hide_pass_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/open_white.png"),
+                                                                             dark_image=Image.open("assets/open_white.png")))
 
 
 # =========== Front-End ===========
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+        
+        # Sets the titlebar icon.
+        self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo@4x.png"))
+        self.wm_iconbitmap()
+        self.iconphoto(False, self.iconpath)
+        
+        # Sets the titlebar name.
+        self.title("DaySphere")
         
         # Defines the on boot up resolution, would like to change it to be dynamic based off of previous session.
         # AKA if closed on second screen while windowed last session, keep it the same on next startup.
@@ -109,74 +116,85 @@ class StartPage(customtkinter.CTkFrame):
         self.button2.grid(row=5, column=1, padx=20, pady=8)
 
 
-# The first screen you see on startup.
-# Preferably changed if "remembered" was True (with user account).
+# Likely the first screen you see on startup, unless if "remembere me" was True, where you should be send to StartPage.
 class LoginPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master)
         
         # TODO
-        # Add labels above entries that display "Username:" and "Password:"
+        # Add refresh connection to server button in bottom right.
         
         # Displays "Log in" text.
         self.login_label = customtkinter.CTkLabel(self, text="Log in", font=customtkinter.CTkFont(self, size=20))
-        self.login_label.grid(row=1, column=0, padx=20, pady=(20, 0))
-        
-        # Entry that takes in the username info.
-        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="Username")
-        self.user_entry.grid(row=2, column=0, padx=20, pady=(20, 8))
+        self.login_label.grid(row=1, column=0, padx=20, pady=20)
+
+        # Displays "Password" text.
+        self.password_label = customtkinter.CTkLabel(self, text="Password", font=customtkinter.CTkFont(self, size=12))
+        self.password_label.grid(row=4, column=0, padx=20, pady=0)
 
         # Entry that takes in the password info.
-        self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="Password")
-        self.pass_entry.grid(row=3, column=0, padx=20, pady=8)
+        self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="")
+        self.pass_entry.grid(row=5, column=0, padx=20, pady=(0, 8))
+        self.pass_entry.bind("<Return>", command=lambda x: [save_remember_me(box_state),
+                                                                     master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get())
+                                                                     else master.error_label.grid(row=1, column=0)])
+        
+        # Displays "Username" text.
+        self.username_label = customtkinter.CTkLabel(self, text="Username", font=customtkinter.CTkFont(self, size=12))
+        self.username_label.grid(row=2, column=0, padx=20, pady=0)
+        
+        # Entry that takes in the username info.
+        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="")
+        self.user_entry.grid(row=3, column=0, padx=20, pady=(0, 8))
+        self.user_entry.bind("<Return>", command=lambda x: self.pass_entry.focus_set())
+        self.user_entry.focus_set()
 
         # Checkbox to find whether the log in information should be saved.
         # check_box_state should be in the same state as box_state.
         check_box_state = customtkinter.StringVar(value="off")
         self.remember_me_checkbox = customtkinter.CTkCheckBox(self, text="Remember me", command=checkbox_event, variable=check_box_state, onvalue="on", offvalue="off")
-        self.remember_me_checkbox.grid(row=4, column=0, padx= 12, pady=12)
+        self.remember_me_checkbox.grid(row=6, column=0, padx= 12, pady=12)
 
-
-        # # Commented out since Pillow can't be installed into the venv.
-        # # Button that toggles if the password is shown or hidden.
-        # self.hide_pass_button = customtkinter.CTkButton(self, text="", width=0, command=lambda: toggle_hidden(self),
-        #                                                 image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
-        #                                                                              dark_image=Image.open("assets/hidden_black.png")),
-        #                                                                              fg_color="transparent")
-        # self.hide_pass_button.grid(row=4, column=0, padx=4, sticky="e")
+        # Button that toggles if the password is shown or hidden.
+        self.hide_pass_button = customtkinter.CTkButton(self, text="", width=0, command=lambda: toggle_hidden(self),
+                                                        image=customtkinter.CTkImage(light_image=Image.open("assets/hidden_white.png"),
+                                                                                     dark_image=Image.open("assets/hidden_black.png")),
+                                                                                     fg_color="transparent")
+        self.hide_pass_button.grid(row=4, column=0, padx=12, pady=4, sticky="e")
         
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
         self.login_button = customtkinter.CTkButton(self, text="Log in",
                                                     command=lambda: [save_remember_me(box_state),
                                                                      master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get())
-                                                                     else master.error_label.grid(row=1, column=0)])
-        self.login_button.grid(row=5, column=0, padx=20, pady=8)
+                                                                     else master.error_label.grid(row=2, column=0), master.error_label_offset.grid(row=0, column=0)])
+        self.login_button.grid(row=7, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
         self.login_button = customtkinter.CTkButton(self, text="Admin Log in", command=lambda: admin_login(master.master))
-        self.login_button.grid(row=6, column=0, padx=20, pady=8)
+        self.login_button.grid(row=8, column=0, padx=20, pady=8)
         
         # Create account button.
         self.acc_creation_menu_button = customtkinter.CTkButton(self, text="Create account", command=lambda: master.master.switch_view(AccountCreationPageFrame),
                                                              fg_color="transparent", hover_color="green")
-        self.acc_creation_menu_button.grid(row=7, column=0, padx=20, pady=(12, 20))
+        self.acc_creation_menu_button.grid(row=9, column=0, padx=20, pady=(12, 20))
         
 
-# Boxes our view LoginPageFrame into a nice Frame, which is the border containing all LoginPage elements.
+# Boxes our view LoginPage into a nice Frame, which is the border containing all LoginPage elements.
 # So the Frame takes up the entire view, and the LoginPage is centered inside.
 # LoginPage's parent is LoginPageFrame, therefore master.master is used in LoginPage.
 class LoginPageFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
-        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
         
         self.login_page_view = LoginPage(self)
-        self.login_page_view.grid(row=0, column=0)
+        self.login_page_view.grid(row=1, column=0)
         
         self.error_label = ErrorLabel(self)
+        self.error_label_offset = customtkinter.CTkLabel(self, height=28, text="")
 
 
 # Page for everything account creation.
@@ -247,7 +265,7 @@ class ErrorLabel(customtkinter.CTkFrame):
         # TODO
         # Change it to also have proper text="" for account creation.
         # Beautify in general.
-        self.error_label = customtkinter.CTkLabel(self, text="Wrong username or password.")
+        self.error_label = customtkinter.CTkLabel(self, text="Wrong username or password.", height=28)
         self.error_label.grid(row=0, column=0)
 
 
