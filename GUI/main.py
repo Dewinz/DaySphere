@@ -126,7 +126,7 @@ class LoginPage(customtkinter.CTkFrame):
         customtkinter.CTkFrame.__init__(self, master)
         
         # TODO
-        # Add refresh connection to server button in bottom right.
+        # Place the password hide/show button on the password entry.
         
         # Displays "Log in" text.
         self.login_label = customtkinter.CTkLabel(self, text="Log in", font=customtkinter.CTkFont(self, size=20))
@@ -172,7 +172,7 @@ class LoginPage(customtkinter.CTkFrame):
         self.login_button = customtkinter.CTkButton(self, text="Log in",
                                                     command=lambda: [save_remember_me(box_state),
                                                                      master.master.switch_view(MainPage) if login(self.user_entry.get(), self.pass_entry.get())
-                                                                     else master.error_label.grid(row=2, column=0), master.error_label_offset.grid(row=0, column=0)])
+                                                                     else master.error_label.grid(row=2, column=1)])
         self.login_button.grid(row=7, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
@@ -193,13 +193,27 @@ class LoginPageFrame(customtkinter.CTkFrame):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
         self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         
         self.login_page_view = LoginPage(self)
-        self.login_page_view.grid(row=1, column=0)
+        self.login_page_view.grid(row=1, column=1)
         
+        # An error label that only appears after a button has been pressed.
         self.error_label = ErrorLabel(self, "Username or password is incorrect.")
-        self.error_label_offset = customtkinter.CTkLabel(self, height=28, text="")
+        
+        # Takes up row=0, allowing for everything to be centered.
+        self.offset_label = customtkinter.CTkLabel(self, height=28, text="")
+        self.offset_label.grid(row=0, column=1)
+
+        # Re-establish connection with the server button.
+        self.refresh_button = customtkinter.CTkButton(self, text="", command=lambda: establish_connection(), width=20, height=20,
+                                                      image=customtkinter.CTkImage(light_image=Image.open("assets/refresh.png"),
+                                                                                     dark_image=Image.open("assets/refresh.png")),
+                                                                                     fg_color=None)
+        self.refresh_button.grid(row=2, column=2, padx=20, pady=20)
+        
+        self.refresh_button_offset = customtkinter.CTkLabel(self, text="", width=20, height=20)
+        self.refresh_button_offset.grid(row=2, column=0, padx=20, pady=20)
 
 
 # Page for everything account creation.
@@ -252,7 +266,7 @@ class AccountCreationPage(customtkinter.CTkFrame):
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account", state="disabled", 
                                                              command=lambda: [master.master.switch_view(MainPage)
                                                              if create_account(self.user_entry.get(), self.pass_entry.get()) else master.error_label.grid(row=2, column=0),
-                                                             master.error_label_offset.grid(row=0, column=0)])
+                                                             master.offset_label.grid(row=0, column=0)])
         self.create_account_button.grid(row=5, column=0, padx=20, pady=(8, 8))
         
         # Button to go back to login view.
@@ -275,7 +289,7 @@ class AccountCreationPageFrame(customtkinter.CTkFrame):
         self.account_creation_page.grid(row=1, column=0)
         
         self.error_label = ErrorLabel(self, "Account name is already in use.")
-        self.error_label_offset = customtkinter.CTkLabel(self, height=28, text="")
+        self.offset_label = customtkinter.CTkLabel(self, height=28, text="")
 
 
 class ErrorLabel(customtkinter.CTkFrame):
@@ -302,7 +316,7 @@ class SettingsPage(customtkinter.CTkFrame):
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=20))
         self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
         
-        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPage))
+        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
         self.logout_button.grid(row=1, column=0, padx=10, pady=20)
 
 
@@ -343,4 +357,3 @@ class MainPage(customtkinter.CTkFrame):
 
 app = App()
 app.mainloop()
-establish_connection()
