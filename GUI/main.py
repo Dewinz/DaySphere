@@ -76,6 +76,8 @@ def password_verification(app_instance):
 
     
 # =========== Front-End ===========
+
+# The App class handles the entire app, it handles primarily startup and switching views.
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
