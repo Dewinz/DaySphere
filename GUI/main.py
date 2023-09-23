@@ -2,7 +2,7 @@ import customtkinter
 from communication.client import login, create_account, establish_connection
 from GUI.terminal import TerminalPageFrame
 from PIL import ImageTk, Image
-from json import load
+from json import load, dump
 import os
 
 # TODO
@@ -16,16 +16,20 @@ import os
 # Notes:
 # For password hiding the assets open_white.png is being used universally since open_black.png doens't look like what it's supposed to.
 # remembered is the variable to determine if client side should immediately go to MainPage or LoginPageFrame.
-# remembered should be changed to read a json file to immediately log in.
-with open("settings.json") as file:
-    settings = load(file)
-
-if settings["remember_me"]:
-    remembered = login()
-else: remembered = False
 
 
 # ============ Back-End ============
+
+with open("settings.json") as file:
+    settings = load(file)
+
+
+def logout():
+    global settings
+    settings["remember_me"] = False
+    with open("settings.json", 'w') as file:
+        dump(settings, file)
+
 
 # (TEMPORARY) login logic to bypass username and password.
 def admin_login(master):
@@ -324,7 +328,7 @@ class SettingsPage(customtkinter.CTkFrame):
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=20))
         self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
         
-        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
+        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: [master.master.switch_view(LoginPageFrame), logout()])
         self.logout_button.grid(row=1, column=0, padx=10, pady=20)
 
 
@@ -364,5 +368,10 @@ class MainPage(customtkinter.CTkFrame):
 
 
 establish_connection()
+
+if settings["remember_me"]:
+    remembered = login()
+else: remembered = False
+
 app = App()
 app.mainloop()
