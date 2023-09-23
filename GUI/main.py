@@ -1,5 +1,6 @@
 import customtkinter
-from communication.client import login, create_account, save_remember_me
+from communication.client import login, create_account
+from json import load
 
 # TODO
 # Refactor the naming to more concise.
@@ -9,7 +10,12 @@ from communication.client import login, create_account, save_remember_me
 # Notes:
 # remembered is the variable to determine if client side should immediately go to StartPage or LoginPageFrame.
 # remembered should be changed to read a json file to immediately log in.
-remembered = False
+with open("settings.json") as file:
+    settings = load(file)
+
+if settings["remember_me"]:
+    remembered = login()
+else: remembered = False
 # Currently breaks the StartPage layout on True.
 
 # Right now if login() were to fail it'll throw an exception, this would need to be caught and used in a label as error on GUI.
@@ -123,9 +129,8 @@ class LoginPage(customtkinter.CTkFrame):
         # The basic user log in button.
         # Lambda is used because it won't cause the login() to invoke on startup but on buttonpress.
         self.login_button = customtkinter.CTkButton(self, text="Log in",
-                                                    command=lambda: [save_remember_me(box_state),
-                                                                     master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get())
-                                                                     else master.error_label.grid(row=1, column=0)])
+                                                    command=lambda: master.master.switch_view(StartPage) if login(self.user_entry.get(), self.pass_entry.get(), box_state)
+                                                                     else master.error_label.grid(row=1, column=0))
         self.login_button.grid(row=5, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.

@@ -2,10 +2,16 @@ from random import randint
 from math import gcd
 import json
 import socket
+import threading
+import _thread
 
-HOST = "192.168.178.2"
-PORT = 5050
+# Server host ip: 192.168.178.2
+# Default host ip: socket.gethostbyname(socket.gethostname())
+
+HOST = socket.gethostbyname(socket.gethostname())
+PORT = 25565
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+userpass = json.load(open('userpass.json'))
 
 def prime_filler():
     """Returns a set filled with prime numbers. May replace since it doesn't quite work the way i want it to."""
@@ -89,53 +95,92 @@ def decoder(keys:[int, int], encoded_text:list):
         s += chr(decrypt([keys[0], keys[1]], num))
     return s
 
+def encrypt(keys:[int, int], message:int|float) -> int:
+    """Encrypts a number using a public key and an additional number."""
+
+    encrypted_text = 1
+    while keys[0] > 0:
+        encrypted_text *= message
+        encrypted_text %= keys[1]
+        keys[0] -= 1
+    return encrypted_text
+
+def encoder(keys:[int, int], message: str) -> list:
+    """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
+    encoded = []
+    # Calling the encrypting function in encoding function
+    for letter in message:
+        encoded.append(encrypt([keys[0], keys[1]], ord(letter)))
+    return encoded
+
 def create_account(User:str, Pass:str):
     """Adds a new account to userpass.json."""
 
-    with open('userpass.json') as file:
-        userpass = json.load(file)
-    keys = list(set_keys())
-    keys.append(Pass)
-    userpass[User] = keys
-    with open('userpass.json', "w") as file:
-        json.dump(userpass, file)
+    global userpass
+    try: userpass[User]
+    except KeyError:
+        keys = list(set_keys())
+        keys.append(Pass)
+        userpass[User] = keys
+        with open('userpass.json', "w") as file:
+            json.dump(userpass, file)
 
 def request_key(User:str) -> [int, int]:
     """Function to request a public key and additional number."""
 
-    with open('userpass.json') as file:
-        userpass = json.load(file)
+    global userpass
     try: return userpass[User][1:3:1]
     except KeyError: return KeyError
 
-def login(User:str, encpass:list) -> bool:
+def login(User:str, encpass:list, remembered:bool=False) -> bool:
     """Attempts a login."""
     
-    with open('userpass.json') as file:
-        userpass = json.load(file)
-    
-    try: return decoder(userpass[User][0:3:2], encpass) == userpass[User][3]
+    global userpass
+    password = userpass[User][3]
+    try:
+        if decoder(userpass[User][0:3:2], encpass) == password:
+            #  TODO Can't update userpass why? Completely blocks the code from running.
+            userpass[User] = list(set_keys()) + [password]
+            with open('userpass.json', "w") as file:
+                json.dump(userpass, file)
+            if remembered == True:
+                reencpass = encoder(userpass[User][1:3:1], password)
+                return reencpass
+            else: return True
+        else: return False
     except: return False
 
+def Main():
+    global s
+    s.bind((HOST, PORT))
+    s.listen()
+    print(f"Listening on ip: {HOST}:{PORT}")
 
+    while True:
+        conn, addr = s.accept()
+        print(f"Connected by {addr}. There are currently {threading.active_count()} connection(s).")
+        _thread.start_new_thread(receive_messages, (conn,))
+        
+    
 
-s.bind((HOST, PORT))
-s.listen()
-print(f"Listening on ip: {HOST}:{PORT}")
-conn, addr = s.accept()
-with conn:
-    print(f"Connected by {addr}")
+def receive_messages(conn:socket.socket):
+    resultdic = {}
     while True:
         data = conn.recv(1024).decode('UTF-8')
         if data:
+            print(data)
             datal = data.split(" ")
+            exec ("result = "+datal[1], None, resultdic)
+            try: result=resultdic["result"]
+            except: pass
+            resultdic = {}
             match datal[0]:
                 case "func->list":
-                    exec (f"try: [conn.sendall(str(i).encode(\"UTF-8\")) for i in {datal[1]}]\nexcept: conn.sendall(str({datal[1]}).encode(\"UTF-8\"))")
+                    conn.sendall((f"{result!r}".replace(" ", "").replace("[", "").replace("]", "")).encode("UTF-8"))
                 case "func->nonit":
-                    exec ("conn.sendall(str({}).encode(\"UTF-8\"))".format(datal[1]))
+                    conn.sendall((str(result)).encode("UTF-8"))
                 case "func->None":
-                    exec (datal[1])
+                    pass
                 case "close":
                     s.close
                     break

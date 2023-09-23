@@ -3,9 +3,10 @@ import json
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.126.31"  # The server's hostname or IP address
-PORT = 5050  # The port used by the server
-
+HOST = "84.105.39.48"  # The server's hostname or IP address
+PORT = 25565  # The port used by the server
+with open("settings.json") as file:
+    settings = json.load(file)
 
 Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Try connection, if not possible continue.
@@ -13,7 +14,7 @@ Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # TODO
 # Should become threaded so it doesn't block GUI from running.
 try: Sendsocket.connect((HOST, PORT))
-except Exception: print(Exception)
+except: print(Exception)
 
 Loggedin = False
 
@@ -33,11 +34,6 @@ def encrypt(keys:[int, int], message:int|float) -> int:
     return encrypted_text
 
 
-def save_remember_me(save):
-    with open("settings.json", 'w') as file:
-        json.dump({"remember_me": save}, file)
-
-
 def encoder(keys:[int, int], message: str) -> list:
     """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
     encoded = []
@@ -47,26 +43,45 @@ def encoder(keys:[int, int], message: str) -> list:
     return encoded
 
 
-def login(User:str, Pass:str) -> bool:
+def login(user:str = "", password:str = "", remember:bool = False) -> bool:
     """Attempts a login"""
-    
-    global Loggedin
-    try:
-        Sendsocket.sendall(f"func->list reqkey(\"{User}\")".encode('UTF-8'))
-        keys = [int(receive()), int(receive())]
-
-        encoded = f"{encoder(keys,Pass)!r}".replace(" ", "")
-
-        Sendsocket.sendall(f"func->nonit login(\"{User}\",{encoded})".encode("UTF-8"))
-        if receive() == "True":
+    global settings
+    if settings["remember_me"] == True:
+        try: 
+            encoded = f"{settings['encpass']}".replace(" ", "")
+            Sendsocket.sendall(f"func->list login(\"{settings['user']}\",{encoded},True)".encode("UTF-8"))
+            settings["encpass"] = [int(i) for i in receive().split(",")]
+            with open("settings.json", 'w') as file:
+                json.dump(settings, file)
             return True
-        return False
-    except:
-        pass
 
-    if not Loggedin:
-        return False
-    return True
+        except:
+            settings["remember_me"] = False
+            with open("settings.json", 'w') as file:
+                json.dump(settings, file)
+            raise ValueError("Remembered username and/or password is incorrect")
+    
+    else:
+        Sendsocket.sendall(f"func->list request_key(\"{user}\")".encode('UTF-8'))
+        try: keys = [int(i) for i in receive().split(",")]
+        except ValueError: return False
+        encoded = f"{encoder(keys,password)!r}".replace(" ", "")
+
+        if remember == True:
+            Sendsocket.sendall(f"func->list login(\"{user}\",{encoded},True)".encode("UTF-8"))
+            try:
+                settings["encpass"] = [int(i) for i in receive().split(",")]
+                settings["user"] = user
+                settings["remember_me"] = True
+                with open("settings.json", 'w') as file:
+                    json.dump(settings, file)
+                return True
+            except: return False
+        else:
+            Sendsocket.sendall(f"func->nonit login(\"{user}\",{encoded})".encode("UTF-8"))
+            if receive() == "True":
+                return True
+            return False
 
 
 def adminlogin():
@@ -78,7 +93,7 @@ def adminlogin():
 
 def create_account(User, Pass) -> bool:
     """Creates a new user account and adds it to userpass.json"""
-
+    Sendsocket.sendall(f"func->None create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
     # TODO
     # Make the server check for the username in userpass.json.
     # If username is in userpass.json the server should return False.
