@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login, create_account, save_remember_me
+from communication.client import login, create_account, save_remember_me, establish_connection
 from PIL import ImageTk, Image
 import os
 
@@ -343,3 +343,4 @@ class MainPage(customtkinter.CTkFrame):
 
 app = App()
 app.mainloop()
+establish_connection()
