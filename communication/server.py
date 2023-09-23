@@ -8,8 +8,8 @@ import _thread
 # Server host ip: 192.168.178.2
 # Default host ip: socket.gethostbyname(socket.gethostname())
 
-HOST = socket.gethostbyname(socket.gethostname())
-PORT = 25565
+HOST = "192.168.178.2"
+PORT = 5050
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 userpass = json.load(open('userpass.json'))
 
@@ -184,3 +184,6 @@ def receive_messages(conn:socket.socket):
                 case "close":
                     s.close
                     break
+                
+if __name__ == "__main__":
+    Main()

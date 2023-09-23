@@ -3,8 +3,8 @@ import json
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.39.48"  # The server's hostname or IP address
-PORT = 25565  # The port used by the server
+HOST = "84.105.126.31"  # The server's hostname or IP address
+PORT = 5050  # The port used by the server
 with open("settings.json") as file:
     settings = json.load(file)
 
@@ -12,11 +12,18 @@ Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Try connection, if not possible continue.
 # This should become a lifecycle, where the connection would be checked and reinstantiated if False.
 # TODO
-# Should become threaded so it doesn't block GUI from running.
-try: Sendsocket.connect((HOST, PORT))
-except: print(Exception)
+# Should debate becoming threaded so it doesn't block GUI from running.
+is_updating = False
+def establish_connection():
+    global is_updating
+    if is_updating: return
+    else:
+        is_updating = True
+        try: Sendsocket.connect((HOST, PORT))
+        except:
+            print("Could not connect to servers.")
+            is_updating = False
 
-Loggedin = False
 
 def receive():
     """Returns recieved messages from the server."""
