@@ -2,8 +2,7 @@ import PyInstaller.__main__
 
 PyInstaller.__main__.run([
     '--onefile',
-    '--windowed',
-    '-n=DaySphere',
+    '-n=DaySphere Server',
     '-i=.\\assets\\logo@4x.ico',
     '.\\communication\\server.py',
 ])
