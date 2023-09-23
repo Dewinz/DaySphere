@@ -357,3 +357,4 @@ class MainPage(customtkinter.CTkFrame):
 
 app = App()
 app.mainloop()
+establish_connection()
