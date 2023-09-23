@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login, create_account, save_remember_me
+from communication.client import login, create_account, save_remember_me, establish_connection
 
 # TODO
 # Refactor the naming to more concise.
@@ -231,3 +231,4 @@ class PageTwo(customtkinter.CTkFrame):
 
 app = App()
 app.mainloop()
+establish_connection()

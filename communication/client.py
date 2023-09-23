@@ -6,14 +6,14 @@ import json
 HOST = "84.105.126.31"  # The server's hostname or IP address
 PORT = 5050  # The port used by the server
 
-
 Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Try connection, if not possible continue.
 # This should become a lifecycle, where the connection would be checked and reinstantiated if False.
 # TODO
 # Should become threaded so it doesn't block GUI from running.
-try: Sendsocket.connect((HOST, PORT))
-except Exception: print(Exception)
+def establish_connection():
+    try: Sendsocket.connect((HOST, PORT))
+    except Exception: print(Exception)
 
 Loggedin = False
 
