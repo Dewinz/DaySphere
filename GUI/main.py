@@ -277,8 +277,8 @@ class AccountCreationPage(customtkinter.CTkFrame):
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account", state="disabled", 
                                                              command=lambda: [master.master.switch_view(MainPage)
-                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else master.error_label.grid(row=2, column=0),
-                                                             master.offset_label.grid(row=0, column=0)])
+                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else [master.error_label.grid(row=2, column=0),
+                                                             master.offset_label.grid(row=0, column=0)]])
         self.create_account_button.grid(row=5, column=0, padx=20, pady=(8, 8))
         
         # Button to go back to login view.

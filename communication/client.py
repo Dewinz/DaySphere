@@ -3,8 +3,8 @@ import json
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.126.31"  # The server's hostname or IP address
-PORT = 5050  # The port used by the server
+HOST = "84.105.39.48"  # The server's hostname or IP address
+PORT = 25565  # The port used by the server
 with open("settings.json") as file:
     settings = json.load(file)
 
@@ -100,7 +100,9 @@ def adminlogin():
 
 def create_account(User, Pass) -> bool:
     """Creates a new user account and adds it to userpass.json"""
-    Sendsocket.sendall(f"func->None create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
+    Sendsocket.sendall(f"func->nonit create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
+    if receive() == "True": return True
+    return False
     # TODO
     # Make the server check for the username in userpass.json.
     # If username is in userpass.json the server should return False.
