@@ -1,5 +1,6 @@
 import customtkinter
 from communication.client import login, create_account, establish_connection
+from GUI.sidebar import Sidebar
 from GUI.terminal import TerminalPageFrame
 from PIL import ImageTk, Image
 from json import load
@@ -12,6 +13,7 @@ import os
 # It's parent, LoginPageFrame however is a page.
 # Accessibility page?
 # Backgrounds?
+# Load screen (remember me handling)? For example "Connecting to servers" with DS logo that scrolls up after done.
 
 # Notes:
 # For password hiding the assets open_white.png is being used universally since open_black.png doens't look like what it's supposed to.
@@ -320,9 +322,10 @@ class SettingsPage(customtkinter.CTkFrame):
         
         # TODO
         # The logout_button should also log out server side.
+        # Add theme settings.
         
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=20))
-        self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
+        self.acc_creation_label.grid(row=0, column=0, padx=10, pady=(20, 0))
         
         self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
         self.logout_button.grid(row=1, column=0, padx=10, pady=20)
@@ -335,32 +338,34 @@ class SettingsPageFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        
+        self.sidebar = Sidebar(self)
+        self.sidebar.grid(row=0, column=0, sticky="ns")
         
         self.account_creation_page = SettingsPage(self)
-        self.account_creation_page.grid(row=1, column=0)
+        self.account_creation_page.grid(row=0, column=1)
 
 
-# The MainPage where all functions can be found and navigated to.
 class MainPage(customtkinter.CTkFrame):
     def __init__(self, master):
-        customtkinter.CTkFrame.__init__(self, master)
+        customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure([0, 2], weight=1)
         
-        self.settings_menu_button = customtkinter.CTkButton(self, command=lambda: master.switch_view(SettingsPageFrame), text="", width=20, height=20,
-                                                         image=customtkinter.CTkImage(light_image=Image.open("assets/gear.jpg"),
-                                                                                     dark_image=Image.open("assets/gear.jpg")),
-                                                                                     fg_color=None)
-        self.settings_menu_button.grid(row=2, column=0, padx=20, pady=20, sticky="sw")
+        self.sidebar = Sidebar(self)
+        self.sidebar.grid(row=0, rowspan=4, column=0, sticky="nsw")
         
         self.button1 = customtkinter.CTkButton(self, text="Open page one", command=lambda: master.switch_view(TerminalPageFrame))
-        self.button1.grid(row=0, column=1, padx=20, pady=8)
+        self.button1.grid(row=1, column=2, padx=20, pady=8)
         
         self.button2 = customtkinter.CTkButton(self, text="Open page two", command=lambda: master.switch_view(SettingsPageFrame))
-        self.button2.grid(row=1, column=1, padx=20, pady=8)
+        self.button2.grid(row=2, column=2, padx=20, pady=8)
+        
+        self.offset_label = customtkinter.CTkLabel(self, text="")
+        self.offset_label.grid(row=3, column=1)
 
 
 establish_connection()

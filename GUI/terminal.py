@@ -36,11 +36,16 @@ class TerminalPageFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
+        from GUI.sidebar import Sidebar
+        
         self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        
+        self.sidebar = Sidebar(self)
+        self.sidebar.grid(row=0, rowspan=2, column=0, stick="ns")
         
         self.terminal_page = TerminalPage(self)
-        self.terminal_page.grid(row=3, column=0, columnspan=5)
+        self.terminal_page.grid(row=1, column=1)
 
 
 # Will contain the logic to autocomplete text.
@@ -77,6 +82,8 @@ def auto_completion(app_instance):
 # Will contain the logic to write to the screen through TerminalPageFrame.
 # TerminalPageFrame can be accessed through app_instance.master.
 def feedback(app_instance, terminal_command):
+    # TODO debate on having a separate file for this logic, seeing as it should be able to do ALL the possible functions.
+    
     if terminal_command == "": return
     print(f"Returned: {terminal_command}")
     app_instance.terminal_entry.delete(0, END)
