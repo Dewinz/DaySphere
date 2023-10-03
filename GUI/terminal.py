@@ -10,7 +10,6 @@ from PIL import Image
 
 # TODO
 # Decide if the TerminalPage is even required.
-# Add Speech Recognition.
 
 
 # A class containing the Terminal, other functionality should not be needed.
