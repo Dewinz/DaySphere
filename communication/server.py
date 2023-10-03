@@ -152,10 +152,7 @@ def receive_messages(conn:socket.socket):
         if data:
             print(data)
             datal = data.split(" ")
-            exec ("result = "+datal[1], None, resultdic)
-            try: result=resultdic["result"]
-            except: pass
-            resultdic = {}
+            result = eval(datal[1])
             match datal[0]:
                 case "func->list":
                     conn.sendall((f"{result!r}".replace(" ", "").replace("[", "").replace("]", "")).encode("UTF-8"))

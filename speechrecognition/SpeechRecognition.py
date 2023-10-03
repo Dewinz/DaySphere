@@ -1,8 +1,9 @@
 import speech_recognition as sr
 import time
 import string
-import Commands
+import speechrecognition.commands as commands
 import re
+from GUI.terminal import TerminalPageFrame
 
 def find_with_spaces(pattern, text):
     pattern = pattern.replace(' ', '')
@@ -24,21 +25,16 @@ class VR:
             return recognizer.listen(source)
         
 
-    def Recognize(recognizer, audio):
+    def Recognize(recognizer: sr.Recognizer, audio):
         print("Processing...")
         try:
             text=recognizer.recognize_whisper(audio, "base", False, None, "english", False)
             nopunc = str(text).lower().translate(str.maketrans('', '', string.punctuation))
 
-            for keyword in Commands.keywords:
+            for keyword in commands.keywords:
                 if keyword in nopunc.replace(" ",""): 
                     print(keyword+" found!")
-
-                    for lena in Commands.lena.keys():
-                        print(nopunc[find_with_spaces(keyword, nopunc)+1:find_with_spaces(keyword, nopunc)+1+lena])
-                        try:
-                            Commands.activation[nopunc[find_with_spaces(keyword, nopunc)+1:find_with_spaces(keyword, nopunc)+1+lena]](nopunc[find_with_spaces(keyword, nopunc)+2+lena:])
-                        except KeyError: continue
+                    print(commands.runfromstring(nopunc[find_with_spaces(keyword, nopunc)+1:]))
                     break
 
                 else: print(keyword+" not found")
