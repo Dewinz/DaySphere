@@ -1,4 +1,5 @@
 import customtkinter
+from speechrecognition.commands import runfromstring
 from tkinter import END
 from PIL import Image
 
@@ -17,6 +18,9 @@ class TerminalPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
+        global app_instance
+        app_instance = self
+
         # Traces the text entered into the terminal_entry, this allows for possible autocomplete.
         terminal_command = customtkinter.StringVar()
         terminal_command.trace_add("write", lambda x, y, z: auto_complete(self, self.terminal_entry.get()))
@@ -39,7 +43,7 @@ class TerminalPage(customtkinter.CTkFrame):
         self.command_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=16), text_color="grey",)
         self.command_label.grid(row=9, column=0)
 
-        self.output_label = customtkinter.CTkLabel(self, text="Haha", font=customtkinter.CTkFont(self, size=20))
+        self.output_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=20))
         self.output_label.grid(row=0, column=0)
 
 
@@ -98,7 +102,7 @@ def feedback(app_instance, terminal_command):
     # Add configure to command_label.
     
     if terminal_command == "": return
-    print(f"Returned: {terminal_command}")
+    app_instance.output_label.configure(text=runfromstring(terminal_command)[0])
     app_instance.terminal_entry.delete(0, END)
     app_instance.command_label.configure(text=terminal_command)
 
