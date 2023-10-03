@@ -21,6 +21,10 @@ class TerminalPage(customtkinter.CTkFrame):
         global app_instance
         app_instance = self
 
+        self.columnconfigure(0, weight=1)
+
+        from speechrecognition.SpeechRecognition import VR
+
         # Traces the text entered into the terminal_entry, this allows for possible autocomplete.
         terminal_command = customtkinter.StringVar()
         terminal_command.trace_add("write", lambda x, y, z: auto_complete(self, self.terminal_entry.get()))
@@ -32,7 +36,9 @@ class TerminalPage(customtkinter.CTkFrame):
         self.terminal_entry.bind("<Return>", command=lambda x: feedback(self, self.terminal_entry.get()) if auto_completed_text == "" else auto_completion(self))
         self.terminal_entry.focus_set()
 
-        self.mic_toggle_button = customtkinter.CTkButton(self, text="")
+        self.mic_toggle_button = customtkinter.CTkButton(self, text="", command=lambda: VR.main(),
+                                                         image=customtkinter.CTkImage(light_image=Image.open("assets/mic_closed.png"), dark_image=Image.open("assets/mic_closed.png")))
+        self.mic_toggle_button.grid(row=10, column=1, padx=20, pady=20)
         
         # Previews auto completion text.
         self.preview_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=20), text_color="grey",
