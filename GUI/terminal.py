@@ -1,5 +1,7 @@
 import customtkinter
+from speechrecognition.commands import runfromstring
 from tkinter import END
+from PIL import Image
 
 # Notes:
 # auto_complete and auto_completion are separate, since auto_complete should show an example of what it will be auto completed to.
@@ -8,7 +10,6 @@ from tkinter import END
 
 # TODO
 # Decide if the TerminalPage is even required.
-# Add Speech Recognition.
 
 
 # A class containing the Terminal, other functionality should not be needed.
@@ -16,26 +17,39 @@ class TerminalPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
+        global app_instance
+        app_instance = self
+
+        self.columnconfigure(0, weight=1)
+
+        from speechrecognition.SpeechRecognition import VR
+
         # Traces the text entered into the terminal_entry, this allows for possible autocomplete.
         terminal_command = customtkinter.StringVar()
         terminal_command.trace_add("write", lambda x, y, z: auto_complete(self, self.terminal_entry.get()))
         
         # Defines the entry and binds it to keys for accessibility.
         self.terminal_entry = customtkinter.CTkEntry(self, width=800, height=40, textvariable=terminal_command, font=customtkinter.CTkFont(self, size=20))
-        self.terminal_entry.grid(row=1, column=0, padx=0, pady=40)
+        self.terminal_entry.grid(row=10, column=0, padx=0, pady=40)
         self.terminal_entry.bind("<Tab>", command=lambda x: [auto_completion(self), self.terminal_entry.focus_set()])
-        self.terminal_entry.bind("<Return>", command=lambda x: feedback(self, self.terminal_entry.get()) if auto_completed_text == "" else auto_completion(self))
+        self.terminal_entry.bind("<Return>", command=lambda x: feedback(self.terminal_entry.get(), False) if auto_completed_text == "" else auto_completion(self))
         self.terminal_entry.focus_set()
+
+        self.mic_toggle_button = customtkinter.CTkButton(self, text="", command=lambda: VR.main(),
+                                                         image=customtkinter.CTkImage(light_image=Image.open("assets/mic_closed.png"), dark_image=Image.open("assets/mic_closed.png")))
+        self.mic_toggle_button.grid(row=10, column=1, padx=20, pady=20)
         
         # Previews auto completion text.
         self.preview_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=20), text_color="grey",
                                                     bg_color="#343638" if master.master._get_appearance_mode() == "dark" else "#F9F9FA")
-        self.preview_label.grid(row=0, column=0, padx=7, pady=10, sticky="w")
+        self.preview_label.grid(row=10, column=0, padx=7, pady=10, sticky="w")
 
         # Displays the previous used command.
         self.command_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=16), text_color="grey",)
-        self.command_label.grid(row=0, column=0)
+        self.command_label.grid(row=9, column=0)
 
+        self.output_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=20))
+        self.output_label.grid(row=0, column=0)
 
 
 # Fits the TerminalPage to the entire view.
@@ -88,11 +102,25 @@ def auto_completion(app_instance):
 
 # Will contain the logic to write to the screen through TerminalPageFrame.
 # TerminalPageFrame can be accessed through app_instance.master.
-def feedback(app_instance, terminal_command):
+def feedback(terminal_command, voice: bool):
     # TODO debate on having a separate file for this logic, seeing as it should be able to do ALL the possible functions.
     # Add configure to command_label.
-    
+    global app_instance
     if terminal_command == "": return
-    print(f"Returned: {terminal_command}")
-    app_instance.terminal_entry.delete(0, END)
+    app_instance.output_label.configure(text=runfromstring(terminal_command))
     app_instance.command_label.configure(text=terminal_command)
+    if not voice:
+        app_instance.terminal_entry.delete(0, END)
+
+
+mic_state = False
+def toggle_mic(app_instance):
+    # TODO
+    # Integrate onto speech recognition.
+
+    global mic_state
+    if mic_state:
+        mic_state = False
+        app_instance.mic_toggle_button.configure(image=customtkinter.CTkImage(light_image=Image.open(""),
+                                                                              dark_image=Image.open("")))
+    else : mic_state = True

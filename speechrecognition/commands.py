@@ -44,7 +44,7 @@ class activation:
         ret=0
         if string[:1] == " ": string = string[1:]
         while string!="":
-            try: n1=int(re.search(r'\d+', string).group())
+            try: n1=int(re.search(r'\d*', string).group())
             except: break
             ret+=n1
             string=string[len(str(n1)):]
@@ -60,6 +60,6 @@ class activation:
 def runfromstring(inputstr):
     global megadic
     for lenak in megadic.keys():
-        try: print(eval(megadic[lenak][inputstr[:lenak]]+f"(\"{inputstr[lenak:]}\")"))
+        try: return eval(megadic[lenak][inputstr[:lenak]]+f"(\"{inputstr[lenak:]}\")")
         except: continue
     

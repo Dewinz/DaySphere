@@ -24,7 +24,7 @@ class Calendar(customtkinter.CTk):
         
         self.calendar_days = CalendarDays(self)
         self.calendar_days.grid(row=0, column=0)
-        
+
 
 # Change this entire class to be a seperate file with all the day inidivually.
 class CalendarDays(customtkinter.CTkFrame):

@@ -8,7 +8,7 @@ class Sidebar(customtkinter.CTkFrame):
         
         from GUI.main import app, MainPage, SettingsPageFrame
         from GUI.terminal import TerminalPageFrame
-        # from GUI.calendar import CalendarPageFrame
+        from GUI.calendar import CalendarPage
         
         self.grid_rowconfigure(3, weight=1)
         
@@ -27,7 +27,7 @@ class Sidebar(customtkinter.CTkFrame):
                                                        fg_color="black", bg_color="black", text="")
         self.terminal_button.grid(row=1, column=0)
         
-        self.calendar_button = customtkinter.CTkButton(self, command=lambda: app.switch_view(CalendarPageFrame), hover_color="black",
+        self.calendar_button = customtkinter.CTkButton(self, command=lambda: app.switch_view(CalendarPage), hover_color="black",
                                                        image=customtkinter.CTkImage(light_image=Image.open("assets/calendar_white.png"),
                                                                                     dark_image=Image.open("assets/calendar_white.png"),
                                                                                     size=(45, 45)), height=80,
