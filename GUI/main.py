@@ -1,7 +1,6 @@
 import customtkinter
 from communication.client import login, create_account, establish_connection
 from GUI.sidebar import Sidebar
-from GUI.terminal import TerminalPageFrame
 from PIL import ImageTk, Image
 from json import load
 import os
@@ -14,6 +13,7 @@ import os
 # Accessibility page?
 # Backgrounds?
 # Load screen (remember me handling)? For example "Connecting to servers" with DS logo that scrolls up after done.
+# Package settings.
 
 # Notes:
 # For password hiding the assets open_white.png is being used universally since open_black.png doens't look like what it's supposed to.
@@ -89,7 +89,7 @@ def password_verification(app_instance):
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        
+
         # Sets the titlebar icon.
         self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo@4x.png"))
         self.wm_iconbitmap()
@@ -190,7 +190,8 @@ class LoginPage(customtkinter.CTkFrame):
         
         # Create account button.
         self.acc_creation_menu_button = customtkinter.CTkButton(self, text="Create account", command=lambda: master.master.switch_view(AccountCreationPageFrame),
-                                                             fg_color="transparent", hover_color="green")
+                                                             fg_color="transparent", hover_color="green", text_color="black" if master.master._get_appearance_mode() == "light"
+                                                                                                                                else "white")
         self.acc_creation_menu_button.grid(row=9, column=0, padx=20, pady=(12, 20))
         
 
@@ -245,18 +246,35 @@ class AccountCreationPage(customtkinter.CTkFrame):
         # Displays "Account Creation" text.
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Account Creation", font=customtkinter.CTkFont(self, size=20))
         self.acc_creation_label.grid(row=0, column = 0, padx=10, pady=(20, 0))
+
+        # Displays "Username" text.
+        self.password_label = customtkinter.CTkLabel(self, text="Username", font=customtkinter.CTkFont(self, size=12))
+        self.password_label.grid(row=1, column=0, padx=20, pady=0)
+
+        # Entry that takes in the password info.
+        self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="", show='*')
+        self.pass_entry.grid(row=4, column=0, padx=20, pady=(0, 8))
+        self.pass_entry.bind("<Return>", command=lambda x: [master.master.switch_view(MainPage) if login(self.user_entry.get(), self.pass_entry.get(), box_state)
+                                                                     else master.error_label.grid(row=1, column=0)])
         
+        # Displays "Password" text.
+        self.username_label = customtkinter.CTkLabel(self, text="Password", font=customtkinter.CTkFont(self, size=12))
+        self.username_label.grid(row=3, column=0, padx=20, pady=0)
+
         # Entry that takes in the username info.
-        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="Username", textvariable=self.username)
-        self.user_entry.grid(row=1, column=0, padx=20, pady=(20, 8))
+        self.user_entry = customtkinter.CTkEntry(self, placeholder_text="", textvariable=self.username)
+        self.user_entry.grid(row=2, column=0, padx=20, pady=(20, 8))
+        self.user_entry.bind("<Return>", lambda x: self.pass_entry.focus_set())
 
         # Entry that takes in the password info.
         self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="Password", show='*', textvariable=self.password)
         self.pass_entry.grid(row=2, column=0, padx=20, pady=8)
+        self.acc_creation_label.bind("<Return>", lambda x: self.pass_ver_entry.focus_set())
         
         # Entry that takes in the password info again to verify.
         self.pass_ver_entry = customtkinter.CTkEntry(self, placeholder_text="Verify password", show='*', textvariable=self.ver_password)
         self.pass_ver_entry.grid(row=3, column=0, padx=20, pady=8)
+        # self.acc_creation_label.bind("<Return>", lambda x: )
         
         # Checkbox to find whether the log in information should be saved.
         # check_box_state should be in the same state as box_state.
@@ -281,7 +299,8 @@ class AccountCreationPage(customtkinter.CTkFrame):
         
         # Button to go back to login view.
         self.go_back_to_login_button = customtkinter.CTkButton(self, text="Go back", command=lambda: master.master.switch_view(LoginPageFrame),
-                                                               fg_color="transparent", hover_color="red")
+                                                               fg_color="transparent", hover_color="red", text_color="black" if master.master._get_appearance_mode() == "light"
+                                                                                                                                else "white")
         self.go_back_to_login_button.grid(row=6, column=0, padx=20, pady=(12,20))
 
 
@@ -358,16 +377,10 @@ class MainPage(customtkinter.CTkFrame):
         self.sidebar = Sidebar(self)
         self.sidebar.grid(row=0, rowspan=4, column=0, sticky="nsw")
         
-        self.button1 = customtkinter.CTkButton(self, text="Open page one", command=lambda: master.switch_view(TerminalPageFrame))
-        self.button1.grid(row=1, column=2, padx=20, pady=8)
-        
-        self.button2 = customtkinter.CTkButton(self, text="Open page two", command=lambda: master.switch_view(SettingsPageFrame))
-        self.button2.grid(row=2, column=2, padx=20, pady=8)
-        
         self.offset_label = customtkinter.CTkLabel(self, text="")
         self.offset_label.grid(row=3, column=1)
 
 
-establish_connection()
+# establish_connection()
 app = App()
 app.mainloop()
