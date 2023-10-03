@@ -1,8 +1,8 @@
 import customtkinter
-from communication.client import login, create_account, establish_connection
+from communication.client import login, create_account, establish_connection, logout
 from GUI.terminal import TerminalPageFrame
 from PIL import ImageTk, Image
-from json import load, dump
+from json import load
 import os
 
 # TODO
@@ -22,13 +22,6 @@ import os
 
 with open("settings.json") as file:
     settings = load(file)
-
-
-def logout():
-    global settings
-    settings["remember_me"] = False
-    with open("settings.json", 'w') as file:
-        dump(settings, file)
 
 
 # (TEMPORARY) login logic to bypass username and password.
