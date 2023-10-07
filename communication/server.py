@@ -1,4 +1,4 @@
-from random import randint, choice
+from random import randint
 from math import gcd
 import json
 import socket
@@ -8,40 +8,60 @@ import _thread
 # Server host ip: 192.168.178.2
 # Default host ip: socket.gethostbyname(socket.gethostname())
 
-HOST = socket.gethostbyname(socket.gethostname())
-PORT = 25565
+HOST = "192.168.178.2"
+PORT = 5050
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 userpass = json.load(open('userpass.json'))
 
-def primes2(n):
-    """ Input n>=6, Returns a list of primes, 2 <= p < n """
-    n, correction = n-n%6+6, 2-(n%6>1)
-    sieve = [True] * (n//3)
-    for i in range(1,int(n**0.5)//3+1):
-      if sieve[i]:
-        k=3*i+1|1
-        sieve[      k*k//3      ::2*k] = [False] * ((n//6-k*k//6-1)//k+1)
-        sieve[k*(k-2*(i&1)+4)//3::2*k] = [False] * ((n//6-k*(k-2*(i&1)+4)//6-1)//k+1)
-    return [2,3] + [3*i+1|1 for i in range(1,n//3-correction) if sieve[i]]
+def prime_filler():
+    """Returns a set filled with prime numbers. May replace since it doesn't quite work the way i want it to."""
+    # A set will be the collection of prime numbers,
+    # where we can select random primes p and q
+    prime = set()
 
-primeslist = primes2(2000)
+    # Method used to fill the primes set is Sieve of
+    # Eratosthenes (a method to collect prime numbers)
+    # No idea how it works but it just adds prime numbers to a set
+    seive = [True] * 250
+    seive[0] = False
+    seive[1] = False
+    for i in range(2, 250):
+        for j in range(i * 2, 250, i):
+            seive[j] = False
+ 
+    # Filling the prime numbers
+    for i in range(len(seive)):
+        if seive[i]:
+            prime.add(i)
+    
+    return prime
+ 
+def pick_random_prime():
+    """Picking a random prime number and erasing that prime number from list because p!=q."""
+    prime = prime_filler()
+    k = randint(0, len(prime) - 1)
+    it = iter(prime)
+    for _ in range(k):
+        next(it)
+ 
+    ret = next(it)
+    prime.remove(ret)
+    return ret
+ 
  
 def set_keys():
     """Set the keys for the RSA encryption algorhithm
     See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/."""
 
-    global primeslist
-
-    prime1 = randint(0,len(primeslist)-1)
-    prime2 = primeslist[choice([randint(0,prime1-1),randint(prime1+1,len(primeslist)-1)])]
-    prime1 = primeslist[prime1]
+    prime1 = pick_random_prime()  # First prime number
+    prime2 = pick_random_prime()  # Second prime number
  
     n = prime1 * prime2
-    phi = (prime1 - 1) * (prime2 - 1)
+    fi = (prime1 - 1) * (prime2 - 1)
  
     public_key = 2
     while True:
-        if gcd(public_key, phi) == 1:
+        if gcd(public_key, fi) == 1:
             break
         public_key += 1
  
@@ -49,7 +69,7 @@ def set_keys():
  
     private_key = 2
     while True:
-        if (private_key * public_key) % phi == 1:
+        if (private_key * public_key) % fi == 1:
             break
         private_key += 1
 
@@ -97,16 +117,13 @@ def create_account(User:str, Pass:str):
     """Adds a new account to userpass.json."""
 
     global userpass
-    try: 
-        userpass[User]
-        return False
+    try: userpass[User]
     except KeyError:
         keys = list(set_keys())
         keys.append(Pass)
         userpass[User] = keys
         with open('userpass.json', "w") as file:
             json.dump(userpass, file)
-        return True
 
 def request_key(User:str) -> [int, int]:
     """Function to request a public key and additional number."""
@@ -122,6 +139,7 @@ def login(User:str, encpass:list, remembered:bool=False) -> bool:
     password = userpass[User][3]
     try:
         if decoder(userpass[User][0:3:2], encpass) == password:
+            #  TODO Can't update userpass why? Completely blocks the code from running.
             userpass[User] = list(set_keys()) + [password]
             with open('userpass.json', "w") as file:
                 json.dump(userpass, file)
@@ -152,7 +170,10 @@ def receive_messages(conn:socket.socket):
         if data:
             print(data)
             datal = data.split(" ")
-            result = eval(datal[1])
+            exec ("result = "+datal[1], None, resultdic)
+            try: result=resultdic["result"]
+            except: pass
+            resultdic = {}
             match datal[0]:
                 case "func->list":
                     conn.sendall((f"{result!r}".replace(" ", "").replace("[", "").replace("]", "")).encode("UTF-8"))

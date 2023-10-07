@@ -14,6 +14,16 @@ for key, value in json.load(open("functions.json")).items():
 
 
 keywords=[
+    # Added new keywords.
+    "Thanks for here"
+    "Thanks for",
+    "Base here",
+    "Base fare",
+    "Thanks sir",
+    "they sphere",
+    "theysphere",
+    "basesphere",
+    # Till here.
     "DaySphere",
     "Day's fair",
     "Day's here",

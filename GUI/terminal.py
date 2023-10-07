@@ -17,12 +17,13 @@ class TerminalPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
-        global app_instance
+        global app_instance, dev_tools
         app_instance = self
+        dev_tools = False
 
         self.columnconfigure(0, weight=1)
 
-        from speechrecognition.SpeechRecognition import VR
+        from speechrecognition.main import VR
 
         # Traces the text entered into the terminal_entry, this allows for possible autocomplete.
         terminal_command = customtkinter.StringVar()
@@ -35,6 +36,9 @@ class TerminalPage(customtkinter.CTkFrame):
         self.terminal_entry.bind("<Return>", command=lambda x: feedback(self.terminal_entry.get(), False) if auto_completed_text == "" else auto_completion(self))
         self.terminal_entry.focus_set()
 
+        # Binds dev tools to F1 using the terminal entry.
+        self.terminal_entry.bind("<F1>", command=lambda x: enable_devtools())
+
         self.mic_toggle_button = customtkinter.CTkButton(self, text="", command=lambda: VR.main(),
                                                          image=customtkinter.CTkImage(light_image=Image.open("assets/mic_closed.png"), dark_image=Image.open("assets/mic_closed.png")))
         self.mic_toggle_button.grid(row=10, column=1, padx=20, pady=20)
@@ -45,11 +49,15 @@ class TerminalPage(customtkinter.CTkFrame):
         self.preview_label.grid(row=10, column=0, padx=7, pady=10, sticky="w")
 
         # Displays the previous used command.
-        self.command_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=16), text_color="grey",)
+        self.command_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=16), text_color="grey")
         self.command_label.grid(row=9, column=0)
 
         self.output_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=20))
         self.output_label.grid(row=0, column=0)
+        
+        # A dev tool to show what the literal command was.
+        self.history_label = customtkinter.CTkLabel(self, text="", font=customtkinter.CTkFont(self, size=16), text_color="grey")
+        self.history_label.grid(row=1, column=0,)
 
 
 # Fits the TerminalPage to the entire view.
@@ -112,6 +120,22 @@ def feedback(terminal_command, voice: bool):
     if not voice:
         app_instance.terminal_entry.delete(0, END)
 
+
+def enable_devtools():
+    global app_instance, dev_tools
+    if dev_tools:
+        dev_tools = False
+        app_instance.history_label.configure(text="")
+    else:
+        dev_tools = True
+        app_instance.history_label.configure(text="devtools on")
+
+
+def history(str):
+    global app_instance, dev_tools
+    if dev_tools == False: return
+    app_instance.history_label.configure(text=str)
+    
 
 mic_state = False
 def toggle_mic(app_instance):

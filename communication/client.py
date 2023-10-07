@@ -3,8 +3,8 @@ import json
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.39.48"  # The server's hostname or IP address
-PORT = 25565  # The port used by the server
+HOST = "84.105.126.31"  # The server's hostname or IP address
+PORT = 5050  # The port used by the server
 with open("settings.json") as file:
     settings = json.load(file)
 
@@ -90,17 +90,6 @@ def login(user:str = "", password:str = "", remember:bool = False) -> bool:
                 return True
             return False
 
-def logout():
-
-     # If we logout from the server the settings variable on the server doesn't get changed. For now this isn't an issue since it's only ever used right after
-     # the initialization and never dumped. If it's changed so that it is dumped somewhere else in the code this could cause an issue where remembered switches
-     # back to true when it shouldn't. Simple fix is to change the variable in the main.py as well as calling this function when logging out.
-
-    global settings
-    settings["remember_me"] = False
-    with open("settings.json", 'w') as file:
-        json.dump(settings, file)
-
 
 def adminlogin():
     """Sets Loggedin variable to true without needing a proper login."""
@@ -111,6 +100,12 @@ def adminlogin():
 
 def create_account(User, Pass) -> bool:
     """Creates a new user account and adds it to userpass.json"""
-    Sendsocket.sendall(f"func->nonit create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
-    if receive() == "True": return True
+    Sendsocket.sendall(f"func->None create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
+    # TODO
+    # Make the server check for the username in userpass.json.
+    # If username is in userpass.json the server should return False.
+    # Otherwise return True, so it should be "return serverpackage".
+
+    
+
     return False
