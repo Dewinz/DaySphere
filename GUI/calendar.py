@@ -4,11 +4,11 @@ class CalendarDay(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master)
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=0)
 
         self.day_label = customtkinter.CTkLabel(self, text="DayNum", font=customtkinter.CTkFont(size=16))
-        self.day_label.grid(row=0, column=0, padx=0, pady=0)
+        self.day_label.grid(row=0, column=0, padx=(4, 0), pady=(4, 0))
 
 
 # Displays an entire week of days.
@@ -64,6 +64,7 @@ class Calendar(customtkinter.CTkFrame):
         self.calendar_week5.grid(row=4, column=0)
         
 
+
 # Fits the CalendarPage to the entire view.
 class CalendarPage(customtkinter.CTkFrame):
     def __init__(self, master):
@@ -71,8 +72,8 @@ class CalendarPage(customtkinter.CTkFrame):
 
         from GUI.sidebar import Sidebar
         
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=0)
         
         self.sidebar = Sidebar(self)
         self.sidebar.grid(row=0, rowspan=2, column=0, stick="ns")

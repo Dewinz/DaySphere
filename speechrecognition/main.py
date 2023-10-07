@@ -1,8 +1,7 @@
 import speech_recognition as sr
-import time
 import string
 import speechrecognition.commands as commands
-from GUI.terminal import app_instance
+from GUI.terminal import feedback, history
 import re
 
 def find_with_spaces(pattern, text):
@@ -35,15 +34,13 @@ class VR:
                 if keyword in nopunc.replace(" ",""): 
                     print(keyword+" found!")
                     # TODO Change to more readable text.
-                    try:
-                        app_instance.command_label.configure(text=nopunc[find_with_spaces(keyword, nopunc)+1:])
-                        app_instance.output_label.configure(text=commands.runfromstring(nopunc[find_with_spaces(keyword, nopunc)+1:]))
-                    except: print("Presumably no app instance")
+                    feedback(terminal_command=nopunc[find_with_spaces(keyword, nopunc)+1:], voice=True)
                     break
 
                 else: print(keyword+" not found")
 
             print(nopunc)
+            history(nopunc)
             print("Recognized text: " + text)
 
         except sr.UnknownValueError:
@@ -58,8 +55,6 @@ class VR:
             print("Adjusting")
             r.adjust_for_ambient_noise(source, 0.2)
 
-        while True:
-            r.listen_in_background(mic, VR.Recognize)
-            time.sleep(1000)
+        r.listen_in_background(mic, VR.Recognize)
 
 if __name__ == "__main__": VR.main()

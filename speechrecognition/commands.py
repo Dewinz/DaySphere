@@ -14,6 +14,16 @@ for key, value in json.load(open("functions.json")).items():
 
 
 keywords=[
+    # Added new keywords.
+    "Thanks for here"
+    "Thanks for",
+    "Base here",
+    "Base fare",
+    "Thanks sir",
+    "they sphere",
+    "theysphere",
+    "basesphere",
+    # Till here.
     "DaySphere",
     "Day's fair",
     "Day's here",
@@ -44,7 +54,7 @@ class activation:
         ret=0
         if string[:1] == " ": string = string[1:]
         while string!="":
-            try: n1=int(re.search(r'\d+', string).group())
+            try: n1=int(re.search(r'\d*', string).group())
             except: break
             ret+=n1
             string=string[len(str(n1)):]
