@@ -373,6 +373,6 @@ class MainPage(customtkinter.CTkFrame):
         self.offset_label.grid(row=3, column=1)
 
 
-# establish_connection()
+establish_connection()
 app = App()
 app.mainloop()

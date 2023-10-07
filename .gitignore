@@ -151,3 +151,34 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+speechrecognition/__pycache__/main.cpython-311.pyc
+speechrecognition/__pycache__/commands.cpython-311.pyc
+GUI/__pycache__/terminal.cpython-311.pyc
+GUI/__pycache__/sidebar.cpython-311.pyc
+GUI/__pycache__/main.cpython-311.pyc
+GUI/__pycache__/calendar.cpython-311.pyc
+DaySphere.spec
+communication/__pycache__/client.cpython-311.pyc
+build/DaySphere/xref-DaySphere.html
+build/DaySphere/warn-DaySphere.txt
+build/DaySphere/PYZ-00.toc
+build/DaySphere/PYZ-00.pyz
+build/DaySphere/PKG-00.toc
+build/DaySphere/EXE-00.toc
+build/DaySphere/DaySphere.pkg
+build/DaySphere/Analysis-00.toc
+communication/__pycache__/client.cpython-311.pyc
+build/DaySphere/xref-DaySphere.html
+build/DaySphere/warn-DaySphere.txt
+build/DaySphere/PYZ-00.toc
+build/DaySphere/PYZ-00.pyz
+build/DaySphere/PKG-00.toc
+build/DaySphere/EXE-00.toc
+build/DaySphere/DaySphere.pkg
+build/DaySphere/Analysis-00.toc
+build/DaySphere Server/warn-DaySphere Server.txt
+build/DaySphere Server/PKG-00.toc
+build/DaySphere Server/EXE-00.toc
+build/DaySphere Server/Analysis-00.toc
+GUI/__pycache__/main.cpython-311.pyc
+GUI/__pycache__/sidebar.cpython-311.pyc
