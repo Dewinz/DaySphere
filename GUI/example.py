@@ -1,48 +1,40 @@
-# Importing Tkinter library 
-# in the environment
 from tkinter import *
-  
-# Creating a window
-window = Tk()
-window.title("Theme Changer")  
-window.geometry("600x800")
-window.config(bg="white")
-  
-  
-# Adding light and dark mode images
-light = PhotoImage(file="assets/gear_white.png")
-dark = PhotoImage(file="assets/gear_black.jpg")
-  
-switch_value = True
-  
-# Defining a function to toggle
-# between light and dark theme
-def toggle():
-  
-    global switch_value
-    if switch_value == True:
-        switch.config(image=dark, bg="#26242f",
-                      activebackground="#26242f")
-          
-        # Changes the window to dark theme
-        window.config(bg="#26242f")  
-        switch_value = False
-  
-    else:
-        switch.config(image=light, bg="white", 
-                      activebackground="white")
-          
-        # Changes the window to light theme
-        window.config(bg="white")  
-        switch_value = True
-  
-  
-# Creating a button to toggle
-# between light and dark themes
-switch = Button(window, image=light, 
-                bd=0, bg="white",
-                activebackground="white", 
-                command=toggle)
-switch.pack(padx=50, pady=150)
-  
-window.mainloop()
+import customtkinter
+
+# a subclass of Canvas for dealing with resizing of windows
+class ResizingCanvas(customtkinter.CTkCanvas):
+    def __init__(self,parent,**kwargs):
+        customtkinter.CTkCanvas.__init__(self,parent,**kwargs)
+        self.bind("<Configure>", self.on_resize)
+        self.height = self.winfo_reqheight()
+        self.width = self.winfo_reqwidth()
+
+    def on_resize(self,event):
+        # determine the ratio of old width/height to new width/height
+        wscale = float(event.width)/self.width
+        hscale = float(event.height)/self.height
+        self.width = event.width
+        self.height = event.height
+        # resize the canvas 
+        self.config(width=self.width, height=self.height)
+        # rescale all the objects tagged with the "all" tag
+        self.scale("all", 0, 0, wscale, hscale)
+
+def main():
+    root = Tk()
+    myframe = Frame(root)
+    myframe.pack(fill=BOTH, expand=YES)
+    mycanvas = ResizingCanvas(myframe,width=850, height=400, bg="red", highlightthickness=0)
+    mycanvas.pack(fill=BOTH, expand=YES)
+
+    # add some widgets to the canvas
+    mycanvas.create_line(0, 0, 200, 100)
+    mycanvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
+    mycanvas.create_rectangle(50, 25, 150, 75, fill="blue")
+
+    # tag all of the drawn widgets
+    mycanvas.addtag_all("all")
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()

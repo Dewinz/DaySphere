@@ -101,6 +101,9 @@ class App(customtkinter.CTk):
         # AKA if closed on second screen while windowed last session, keep it the same on next startup.
         self.geometry("1000x750")
 
+        # Sets the constraint on window size.
+        self.minsize(600, 600)
+
         # Define a private variable which contains the view.
         self._view = None
         

@@ -1,14 +1,84 @@
 import customtkinter
 
-class CalendarDay(customtkinter.CTkFrame):
+
+# Initializes what the first day will say and count from there.
+# TODO
+# Make the code less nested/more efficient.
+day_number = 1
+month = 1
+year = 2020
+def get_calendar_day():
+    global day_number, month, year
+    if month == 2:
+        if year % 4 == 0:
+            if day_number + 1 > 29:
+                month += 1
+                day_number = 1
+            else:
+                day_number += 1
+        else:
+            if day_number + 1 > 28:
+                month += 1
+                day_number = 1
+            else:
+                day_number += 1
+    elif month % 2 == 1:
+        if day_number + 1 > 31:
+            month += 1
+            day_number = 1
+        else:
+            day_number += 1
+    else:
+        if day_number + 1 > 30:
+            if month + 1 > 12:
+                year += 1
+                month = 1
+                day_number = 1
+            else:
+                month += 1
+                day_number = 1
+        else:
+            day_number += 1
+    # Change to return the month and day_number, if month is odd from the rest, show it.
+    return day_number
+
+
+# a subclass of Canvas for dealing with resizing of windows
+class ResizingCanvas(customtkinter.CTkCanvas):
+    def __init__(self,parent,**kwargs):
+        customtkinter.CTkCanvas.__init__(self,parent,**kwargs)
+        self.bind("<Configure>", self.on_resize)
+        self.height = self.winfo_reqheight()
+        self.width = self.winfo_reqwidth()
+
+    def on_resize(self,event):
+        # determine the ratio of old width/height to new width/height
+        wscale = float(event.width)/self.width
+        hscale = float(event.height)/self.height
+        self.width = event.width
+        self.height = event.height
+        # resize the canvas 
+        self.config(width=self.width, height=self.height)
+        # rescale all the objects tagged with the "all" tag
+        self.scale("all", 0, 0, wscale, hscale)
+
+
+class CalendarDay(ResizingCanvas):
     def __init__(self, master):
-        customtkinter.CTkFrame.__init__(self, master)
+        # Specify the background for a calendar day, should be adaptive on lightmode or darkmode.
+        customtkinter.CTkCanvas.__init__(self, master, bg="black")
 
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(1, weight=0)
+        global day_number
 
-        self.day_label = customtkinter.CTkLabel(self, text="DayNum", font=customtkinter.CTkFont(size=16))
-        self.day_label.grid(row=0, column=0, padx=(4, 0), pady=(4, 0))
+        self.day_label = customtkinter.CTkLabel(self, text=lambda: [get_calendar_day(), print(day_number)], font=customtkinter.CTkFont(size=30))
+        self.day_label.grid(row=0, column=0, sticky="nw", padx=8, pady=8)
+
+        self.info_label = customtkinter.CTkLabel(self, text="TODO", font=customtkinter.CTkFont(size=16))
+        self.info_label.grid(row=1, column=0, padx=8, pady=4, sticky="w")
+
+        # Makes sure the CalendarDay takes up as much space as it can.
+        self.offset_label = customtkinter.CTkLabel(self, text="")
+        self.offset_label.grid(row=10, column=10, padx=200, pady=200)
 
 
 # Displays an entire week of days.
@@ -20,13 +90,13 @@ class CalendarWeek(customtkinter.CTkFrame):
         self.grid_columnconfigure([0, 1, 2, 3, 4, 5, 6], weight=1)
 
         self.calendar_day1 = CalendarDay(self)
-        self.calendar_day1.grid(row=0, column=1)
+        self.calendar_day1.grid(row=0, column=0)
 
         self.calendar_day2 = CalendarDay(self)
-        self.calendar_day2.grid(row=0, column=2)
+        self.calendar_day2.grid(row=0, column=1)
         
         self.calendar_day3 = CalendarDay(self)
-        self.calendar_day3.grid(row=0, column=3)
+        self.calendar_day3.grid(row=0, column=2)
         
         self.calendar_day4 = CalendarDay(self)
         self.calendar_day4.grid(row=0, column=3)
@@ -72,14 +142,11 @@ class CalendarPage(customtkinter.CTkFrame):
 
         from GUI.sidebar import Sidebar
         
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_columnconfigure(1, weight=0)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
         
         self.sidebar = Sidebar(self)
         self.sidebar.grid(row=0, rowspan=2, column=0, stick="ns")
         
         self.calendar = Calendar(self)
         self.calendar.grid(row=0, column=1)
-
-        self.offset_label = customtkinter.CTkLabel(self, text="")
-        self.offset_label.grid(row=1, column=1)
