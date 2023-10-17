@@ -4,43 +4,59 @@ import customtkinter
 # Initializes what the first day will say and count from there.
 # TODO
 # Make the code less nested/more efficient.
-day_number = 1
+
+day = 1
 month = 1
-year = 2020
+year  = 1
+
+day_number = day
+month_number = month
+year_number = year
+
+counter = 0
+
 def get_calendar_day():
-    global day_number, month, year
-    if month == 2:
-        if year % 4 == 0:
+    global day_number, day, month_number, month, year_number, year, counter
+    if month_number == 2:
+        if year_number % 4 == 0:
             if day_number + 1 > 29:
-                month += 1
+                month_number += 1
                 day_number = 1
             else:
                 day_number += 1
         else:
             if day_number + 1 > 28:
-                month += 1
+                month_number += 1
                 day_number = 1
             else:
                 day_number += 1
-    elif month % 2 == 1:
+    elif month_number % 2 == 1:
         if day_number + 1 > 31:
-            month += 1
+            month_number += 1
             day_number = 1
         else:
             day_number += 1
     else:
         if day_number + 1 > 30:
-            if month + 1 > 12:
-                year += 1
-                month = 1
+            if month_number + 1 > 12:
+                year_number += 1
+                month_number = 1
                 day_number = 1
             else:
-                month += 1
+                month_number += 1
                 day_number = 1
         else:
             day_number += 1
+    # Counts how many times get_calendar_day() has been called.
+    counter += 1
+    # If get_calendar_day has been called for an entire view amount of times (35), reset to initial day, month and year.
+    if counter == 35:
+        day_number = day
+        month_number = month
+        year_number - year
+        counter = 0
     # Change to return the month and day_number, if month is odd from the rest, show it.
-    return day_number
+    # return day_number
 
 
 # a subclass of Canvas for dealing with resizing of windows
@@ -66,12 +82,12 @@ class ResizingCanvas(customtkinter.CTkCanvas):
 class CalendarDay(ResizingCanvas):
     def __init__(self, master):
         # Specify the background for a calendar day, should be adaptive on lightmode or darkmode.
-        customtkinter.CTkCanvas.__init__(self, master, bg="black")
+        customtkinter.CTkCanvas.__init__(self, master, bg="black" if master.master.master.master._get_appearance_mode() == "dark" else "white")
 
-        global day_number
-
-        self.day_label = customtkinter.CTkLabel(self, text=lambda: [get_calendar_day(), print(day_number)], font=customtkinter.CTkFont(size=30))
+        self.day_label = customtkinter.CTkLabel(self, text=day_number, font=customtkinter.CTkFont(size=30))
         self.day_label.grid(row=0, column=0, sticky="nw", padx=8, pady=8)
+
+        get_calendar_day()
 
         self.info_label = customtkinter.CTkLabel(self, text="TODO", font=customtkinter.CTkFont(size=16))
         self.info_label.grid(row=1, column=0, padx=8, pady=4, sticky="w")
