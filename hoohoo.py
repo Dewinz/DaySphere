@@ -1,2 +1,2 @@
-import speechrecognition.SpeechRecognition as sr
+import speechrecognition.main as sr
 sr.VR.main()

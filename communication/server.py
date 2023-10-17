@@ -8,8 +8,8 @@ import _thread
 # Server host ip: 192.168.178.2
 # Default host ip: socket.gethostbyname(socket.gethostname())
 
-HOST = "192.168.178.2"
-PORT = 5050
+HOST = socket.gethostbyname(socket.gethostname())
+PORT = 25565
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 userpass = json.load(open('userpass.json'))
 

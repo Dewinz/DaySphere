@@ -3,8 +3,8 @@ import json
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.126.31"  # The server's hostname or IP address
-PORT = 5050  # The port used by the server
+HOST = "84.105.39.48"  # The server's hostname or IP address
+PORT = 25565  # The port used by the server
 with open("settings.json") as file:
     settings = json.load(file)
 

@@ -4,6 +4,8 @@ import speechrecognition.commands as commands
 from GUI.terminal import feedback, history
 import re
 
+listening = False
+
 def find_with_spaces(pattern, text):
     pattern = pattern.replace(' ', '')
     pattern_re = re.compile(' *'.join(map(re.escape, pattern)))
@@ -13,6 +15,10 @@ def find_with_spaces(pattern, text):
         return m.end()
     
 class VR:
+    recog = sr.Recognizer()
+    mic = sr.Microphone()
+    recog.dynamic_energy_threshold = False
+
     def Record(recognizer, mic):
 
         if not isinstance(recognizer, sr.Recognizer): raise TypeError("`recognizer` must be `Recognizer` instance")
@@ -25,7 +31,8 @@ class VR:
         
 
     def Recognize(recognizer: sr.Recognizer, audio):
-        print("Processing...")
+        print(recognizer.energy_threshold)
+        history("Processing...")
         try:
             text=recognizer.recognize_whisper(audio, "base", False, None, "english", False)
             nopunc = str(text).lower().translate(str.maketrans('', '', string.punctuation))
@@ -37,11 +44,10 @@ class VR:
                     feedback(terminal_command=nopunc[find_with_spaces(keyword, nopunc)+1:], voice=True)
                     break
 
-                else: print(keyword+" not found")
+                 # else: print(keyword+" not found")
 
-            print(nopunc)
             history(nopunc)
-            print("Recognized text: " + text)
+             # print("Recognized text: " + text)
 
         except sr.UnknownValueError:
             print("Speech recognition could not understand audio")
@@ -49,12 +55,17 @@ class VR:
             print("Could not request results from the speech recognition service; {0}".format(e))
 
     def main():
-        r = sr.Recognizer()
-        mic = sr.Microphone()
-        with mic as source:
-            print("Adjusting")
-            r.adjust_for_ambient_noise(source, 0.2)
+        global listening_thread, listening
 
-        r.listen_in_background(mic, VR.Recognize)
+        if not listening: 
+            with VR.mic as source:
+                history("Adjusting")
+                VR.recog.adjust_for_ambient_noise(source, 0.5)
+                print(VR.recog.energy_threshold)
+            
+            listening_thread = VR.recog.listen_in_background(VR.mic, VR.Recognize)
+            history("Listening...")
+        else: listening_thread()
+        listening = not listening
 
 if __name__ == "__main__": VR.main()

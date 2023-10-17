@@ -7,9 +7,11 @@ from PIL import Image
 # auto_complete and auto_completion are separate, since auto_complete should show an example of what it will be auto completed to.
 # And auto_completion will actually input that.
 
+dev_tools = False
 
 # TODO
 # Decide if the TerminalPage is even required.
+# Add rowspan to feedback on Terminal.
 
 
 # A class containing the Terminal, other functionality should not be needed.
@@ -19,7 +21,6 @@ class TerminalPage(customtkinter.CTkFrame):
         
         global app_instance, dev_tools
         app_instance = self
-        dev_tools = False
 
         self.columnconfigure(0, weight=1)
 
@@ -134,7 +135,8 @@ def enable_devtools():
 def history(str):
     global app_instance, dev_tools
     if dev_tools == False: return
-    app_instance.history_label.configure(text=str)
+    try: app_instance.history_label.configure(text=str)
+    except: pass
     
 
 mic_state = False
