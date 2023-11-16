@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login, create_account, establish_connection
+from communication.client import login, create_account, establish_connection, logout, close_program
 from GUI.sidebar import Sidebar
 from PIL import ImageTk, Image
 from json import load
@@ -21,6 +21,8 @@ import os
 # remembered should be changed to read a json file to immediately log in.
 with open("settings.json") as file:
     settings = load(file)
+
+establish_connection()
 
 if settings["remember_me"]:
     remembered = login()
@@ -88,6 +90,8 @@ def password_verification(app_instance):
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+
+        self.protocol("WM_DELETE_WINDOW", lambda: [close_program(), self.destroy()])
 
         # Sets the titlebar icon.
         self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo@4x.png"))
@@ -285,8 +289,8 @@ class AccountCreationPage(customtkinter.CTkFrame):
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account", state="disabled", 
                                                              command=lambda: [master.master.switch_view(MainPage)
-                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else master.error_label.grid(row=2, column=0),
-                                                             master.offset_label.grid(row=0, column=0)])
+                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else [master.error_label.grid(row=2, column=0),
+                                                             master.offset_label.grid(row=0, column=0)]])
         self.create_account_button.grid(row=8, column=0, padx=20, pady=8)
         
         # Button to go back to login view.
@@ -338,7 +342,7 @@ class SettingsPage(customtkinter.CTkFrame):
         self.acc_creation_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=20))
         self.acc_creation_label.grid(row=0, column=0, padx=10, pady=(20, 0))
         
-        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
+        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: [master.master.switch_view(LoginPageFrame), logout()])
         self.logout_button.grid(row=1, column=0, padx=10, pady=20)
 
 
@@ -372,7 +376,5 @@ class MainPage(customtkinter.CTkFrame):
         self.offset_label = customtkinter.CTkLabel(self, text="")
         self.offset_label.grid(row=3, column=1)
 
-
-establish_connection()
 app = App()
 app.mainloop()

@@ -1,9 +1,10 @@
-from random import randint
+from random import randint, choice
 from math import gcd
 import json
 import socket
-import threading
-import _thread
+from threading import Lock, local, active_count, Thread
+from os import urandom
+from hashlib import sha256
 
 # Server host ip: 192.168.178.2
 # Default host ip: socket.gethostbyname(socket.gethostname())
@@ -12,56 +13,38 @@ HOST = socket.gethostbyname(socket.gethostname())
 PORT = 25565
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 userpass = json.load(open('userpass.json'))
+userpasslock = Lock()
+Threadlocalvars = local()
 
-def prime_filler():
-    """Returns a set filled with prime numbers. May replace since it doesn't quite work the way i want it to."""
-    # A set will be the collection of prime numbers,
-    # where we can select random primes p and q
-    prime = set()
+def primes2(n):
+    """ Input n>=6, Returns a list of primes, 2 <= p < n """
+    n, correction = n-n%6+6, 2-(n%6>1)
+    sieve = [True] * (n//3)
+    for i in range(1,int(n**0.5)//3+1):
+      if sieve[i]:
+        k=3*i+1|1
+        sieve[      k*k//3      ::2*k] = [False] * ((n//6-k*k//6-1)//k+1)
+        sieve[k*(k-2*(i&1)+4)//3::2*k] = [False] * ((n//6-k*(k-2*(i&1)+4)//6-1)//k+1)
+    return [2,3] + [3*i+1|1 for i in range(1,n//3-correction) if sieve[i]]
 
-    # Method used to fill the primes set is Sieve of
-    # Eratosthenes (a method to collect prime numbers)
-    # No idea how it works but it just adds prime numbers to a set
-    seive = [True] * 250
-    seive[0] = False
-    seive[1] = False
-    for i in range(2, 250):
-        for j in range(i * 2, 250, i):
-            seive[j] = False
- 
-    # Filling the prime numbers
-    for i in range(len(seive)):
-        if seive[i]:
-            prime.add(i)
-    
-    return prime
- 
-def pick_random_prime():
-    """Picking a random prime number and erasing that prime number from list because p!=q."""
-    prime = prime_filler()
-    k = randint(0, len(prime) - 1)
-    it = iter(prime)
-    for _ in range(k):
-        next(it)
- 
-    ret = next(it)
-    prime.remove(ret)
-    return ret
- 
- 
-def set_keys():
-    """Set the keys for the RSA encryption algorhithm
+primeslist = primes2(2000)
+
+def regenerate_encvars(saltlength = 16):
+    """Set the keys for the RSA encryption algorhithm and generates a salt
     See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/."""
 
-    prime1 = pick_random_prime()  # First prime number
-    prime2 = pick_random_prime()  # Second prime number
+    global primeslist
+
+    prime1 = randint(10,len(primeslist)-1)
+    prime2 = primeslist[choice([randint(0,prime1-1),randint(prime1+1,len(primeslist)-1)])]
+    prime1 = primeslist[prime1]
  
     n = prime1 * prime2
-    fi = (prime1 - 1) * (prime2 - 1)
+    phi = (prime1 - 1) * (prime2 - 1)
  
     public_key = 2
     while True:
-        if gcd(public_key, fi) == 1:
+        if gcd(public_key, phi) == 1:
             break
         public_key += 1
  
@@ -69,86 +52,110 @@ def set_keys():
  
     private_key = 2
     while True:
-        if (private_key * public_key) % fi == 1:
+        if (private_key * public_key) % phi == 1:
             break
         private_key += 1
 
-    return private_key, public_key, n
+    salt = str(urandom(saltlength)).removeprefix("b\'").removesuffix("\'")
 
+    return private_key, public_key, n, salt
 
-def decrypt(keys:[int, int], encrypted_number:int|float):
-    """Decrypts an encrypted integer/float using a private key and additional number."""
+class RSA:
+    def decrypt(keys:[int, int], encrypted_number:int|float):
+        """Decrypts an encrypted integer/float using a private key and additional number."""
 
-    decrypted = 1
-    while keys[0] > 0:
-        decrypted *= encrypted_number
-        decrypted %= keys[1]
-        keys[0] -= 1
-    return decrypted
- 
-def decoder(keys:[int, int], encoded_text:list):
-    """Decodes a list of encrypted ascii numbers of letters using a private key and an additional number."""
+        decrypted = 1
+        while keys[0] > 0:
+            decrypted *= encrypted_number
+            decrypted %= keys[1]
+            keys[0] -= 1
+        return decrypted
+    
+    def decoder(keys:[int, int], encoded_text:list):
+        """Decodes a list of encrypted ascii numbers of letters using a private key and an additional number."""
 
-    s = ''
-    # Calling the decrypting function decoding function
-    for num in encoded_text:
-        s += chr(decrypt([keys[0], keys[1]], num))
-    return s
+        s = ''
+        # Calling the decrypting function decoding function
+        for num in encoded_text:
+            s += chr(RSA.decrypt([keys[0], keys[1]], num))
+        return s
 
-def encrypt(keys:[int, int], message:int|float) -> int:
-    """Encrypts a number using a public key and an additional number."""
+    def encrypt(keys:[int, int], message:int|float) -> int:
+        """Encrypts a number using a public key and an additional number."""
 
-    encrypted_text = 1
-    while keys[0] > 0:
-        encrypted_text *= message
-        encrypted_text %= keys[1]
-        keys[0] -= 1
-    return encrypted_text
+        encrypted_text = 1
+        while keys[0] > 0:
+            encrypted_text *= message
+            encrypted_text %= keys[1]
+            keys[0] -= 1
+        return encrypted_text
 
-def encoder(keys:[int, int], message: str) -> list:
-    """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
-    encoded = []
-    # Calling the encrypting function in encoding function
-    for letter in message:
-        encoded.append(encrypt([keys[0], keys[1]], ord(letter)))
-    return encoded
+    def encoder(keys:[int, int], message: str) -> list:
+        """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
+        encoded = []
+        # Calling the encrypting function in encoding function
+        for letter in message:
+            encoded.append(RSA.encrypt([keys[0], keys[1]], ord(letter)))
+        return encoded
 
-def create_account(User:str, Pass:str):
-    """Adds a new account to userpass.json."""
+class Accounts:
 
-    global userpass
-    try: userpass[User]
-    except KeyError:
-        keys = list(set_keys())
-        keys.append(Pass)
-        userpass[User] = keys
+    def create_account(User:str, Pass:str):
+        """Adds a new account to userpass.json."""
+
+        global userpass
+        global userpasslock
+        global Threadlocalvars
+        userpasslock.acquire()
+        try: 
+            userpass[User]
+            userpasslock.release()
+            return False
+        except KeyError:
+            Accounts.__savepass(User, Pass)
+            userpasslock.release()
+            Threadlocalvars.Username = User
+            return True
+
+    def request_key(User:str) -> [int, int]:
+        """Function to request a public key and additional number."""
+
+        global userpass
+        try: return userpass[User][1:3:1]
+        except KeyError: return KeyError
+
+    def login(User:str, encpass:list, remembered:bool=False) -> bool:
+        """Attempts a login."""
+        
+        global userpass
+        global userpasslock
+        global Threadlocalvars
+        userpasslock.acquire()
+        try:
+            if sha256((userpass[User][3] + f"{encpass}".replace(" ","").replace("[","").replace("]","")).encode('UTF-8')).hexdigest() == userpass[User][4]:
+                Pass = RSA.decoder(userpass[User][0:3:2], encpass)
+                Accounts.__savepass(User, Pass)
+                Threadlocalvars.Username = User
+                if remembered == True:
+                    reencpass = RSA.encoder(userpass[User][1:3:1], Pass)
+                    userpasslock.release()
+                    return reencpass
+                else: 
+                    userpasslock.release()
+                    return True
+            else: 
+                userpasslock.release()
+                return False
+        except: 
+            userpasslock.release()
+            return False
+    
+    def __savepass(User:str, Pass:list):
+        encvars = list(regenerate_encvars())
+        encpass = sha256((encvars[3] + f"{RSA.encoder(encvars[1:3:1], Pass)}".replace(" ","").replace("[","").replace("]","")).encode('UTF-8')).hexdigest()
+        userpass[User] = encvars+[encpass]
         with open('userpass.json', "w") as file:
             json.dump(userpass, file)
-
-def request_key(User:str) -> [int, int]:
-    """Function to request a public key and additional number."""
-
-    global userpass
-    try: return userpass[User][1:3:1]
-    except KeyError: return KeyError
-
-def login(User:str, encpass:list, remembered:bool=False) -> bool:
-    """Attempts a login."""
-    
-    global userpass
-    password = userpass[User][3]
-    try:
-        if decoder(userpass[User][0:3:2], encpass) == password:
-            #  TODO Can't update userpass why? Completely blocks the code from running.
-            userpass[User] = list(set_keys()) + [password]
-            with open('userpass.json', "w") as file:
-                json.dump(userpass, file)
-            if remembered == True:
-                reencpass = encoder(userpass[User][1:3:1], password)
-                return reencpass
-            else: return True
-        else: return False
-    except: return False
 
 def Main():
     global s
@@ -158,22 +165,24 @@ def Main():
 
     while True:
         conn, addr = s.accept()
-        print(f"Connected by {addr}. There are currently {threading.active_count()} connection(s).")
-        _thread.start_new_thread(receive_messages, (conn,))
+        print(f"Connected by {addr}. There are currently {active_count()} connection(s).")
+        Thread(target=receive_messages, args=(conn,), daemon=True).start()
         
     
 
 def receive_messages(conn:socket.socket):
-    resultdic = {}
     while True:
-        data = conn.recv(1024).decode('UTF-8')
+        try:
+            data = conn.recv(1024).decode('UTF-8')
+        except Exception as e:
+            if str(e) == "[WinError 10054] An existing connection was forcibly closed by the remote host":
+                conn.close()
+                break
         if data:
             print(data)
             datal = data.split(" ")
-            exec ("result = "+datal[1], None, resultdic)
-            try: result=resultdic["result"]
-            except: pass
-            resultdic = {}
+            if len(datal)>1:
+                result = eval(datal[1])
             match datal[0]:
                 case "func->list":
                     conn.sendall((f"{result!r}".replace(" ", "").replace("[", "").replace("]", "")).encode("UTF-8"))
@@ -182,7 +191,7 @@ def receive_messages(conn:socket.socket):
                 case "func->None":
                     pass
                 case "close":
-                    s.close
+                    conn.close()
                     break
                 
 if __name__ == "__main__":
