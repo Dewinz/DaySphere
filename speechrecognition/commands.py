@@ -1,11 +1,11 @@
-import string
-import json
-import re
+from string import punctuation
+from json import load
+from re import Match, search
 
 
 megadic = {}
 
-for key, value in json.load(open("functions.json")).items():
+for key, value in load(open("functions.json")).items():
     try: megadic[len(key)][key] = value
     except:
         megadic[len(key)] = {}
@@ -45,7 +45,7 @@ keywords=[
     ]
 
 for i in range(len(keywords)):
-    keywords[i]=keywords[i].lower().translate(str.maketrans('', '', string.punctuation)).replace(" ","")
+    keywords[i]=keywords[i].lower().translate(str.maketrans('', '', punctuation)).replace(" ","")
 
 
 
@@ -54,7 +54,7 @@ class activation:
         ret=0
         if string[:1] == " ": string = string[1:]
         while string!="":
-            try: n1=int(re.search(r'\d*', string).group())
+            try: n1=int(search(r'\d*', string).group())
             except: break
             ret+=n1
             string=string[len(str(n1)):]
@@ -64,12 +64,20 @@ class activation:
             elif string[:1] == " ": string=string[1:]
             else: break
         return ret
-    
-
 
 def runfromstring(inputstr):
     global megadic
     for lenak in megadic.keys():
-        try: return eval(megadic[lenak][inputstr[:lenak]]+f"(\"{inputstr[lenak:]}\")")
+        try: function = megadic[lenak][inputstr[:lenak].lower()]
         except: continue
+        
+        if type(function) == str: function = [function, "str"]
+
+        if function[1] == "str":
+            return eval(function[0] + f"(\"{inputstr[lenak:].lower()}\")")
+        elif function[1] == "var":
+            return eval(function[0] + f"(*{tuple(inputstr[lenak:].lower().split(' ')[1:])})")
+        else:
+            return eval(function[0] + f"(*{tuple(inputstr[lenak:].lower().split(' ')[1:function[1]+1])})")
+        
     

@@ -1,17 +1,15 @@
-import socket
-import json
+from socket import socket, AF_INET, SOCK_STREAM
+from json import dump, load
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-HOST = "84.105.39.48"  # The server's hostname or IP address
-PORT = 25565  # The port used by the server
 with open("settings.json") as file:
-    settings = json.load(file)
+    settings = load(file)
 
 def establish_connection():
     global Sendsocket
-    Sendsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    Sendsocket.connect((HOST, PORT))
+    Sendsocket = socket(AF_INET, SOCK_STREAM)
+    Sendsocket.connect((settings["host"], settings["port"]))
 
 def receive():
     """Returns recieved messages from the server."""
@@ -42,41 +40,35 @@ def login(user:str = "", password:str = "", remember:bool = False) -> bool:
     """Attempts a login"""
     global settings
     if settings["remember_me"] == True:
-        try: 
-            encoded = f"{settings['encpass']}".replace(" ", "")
-            Sendsocket.sendall(f"func->list Accounts.login(\"{settings['user']}\",{encoded},True)".encode("UTF-8"))
-            settings["encpass"] = [int(i) for i in receive().split(",")]
-            with open("settings.json", 'w') as file:
-                json.dump(settings, file)
-            return True
+        encoded = f"{settings['encpass']}".replace(" ", "")
+        user = settings["user"]
+        remember=True
 
-        except:
-            settings["remember_me"] = False
-            with open("settings.json", 'w') as file:
-                json.dump(settings, file)
-            raise ValueError("Remembered username and/or password is incorrect")
-    
     else:
         Sendsocket.sendall(f"func->list Accounts.request_key(\"{user}\")".encode('UTF-8'))
         try: keys = [int(i) for i in receive().split(",")]
         except ValueError: return False
         encoded = f"{encoder(keys,password)!r}".replace(" ", "")
 
-        if remember == True:
-            Sendsocket.sendall(f"func->list Accounts.login(\"{user}\",{encoded},True)".encode("UTF-8"))
-            try:
-                settings["encpass"] = [int(i) for i in receive().split(",")]
-                settings["user"] = user
-                settings["remember_me"] = True
-                with open("settings.json", 'w') as file:
-                    json.dump(settings, file)
-                return True
-            except: return False
-        else:
-            Sendsocket.sendall(f"func->nonit Accounts.login(\"{user}\",{encoded})".encode("UTF-8"))
-            if receive() == "True":
-                return True
+    if remember == True:
+        Sendsocket.sendall(f"func->list Accounts.login(\"{user}\",{encoded},True)".encode("UTF-8"))
+        try:
+            settings["encpass"] = [int(i) for i in receive().split(",")]
+            settings["user"] = user
+            settings["remember_me"] = True
+            with open("settings.json", 'w') as file:
+                dump(settings, file)
+            return True
+        except:
+            settings["remember_me"] = False
+            with open("settings.json", 'w') as file:
+                dump(settings, file)
             return False
+    else:
+        Sendsocket.sendall(f"func->nonit Accounts.login(\"{user}\",{encoded})".encode("UTF-8"))
+        if receive() == "True":
+            return True
+        return False
 
 def logout():
      # If we logout from the server the settings variable on the server doesn't get changed. For now this isn't an issue since it's only ever used right after
@@ -85,7 +77,7 @@ def logout():
     global settings
     settings["remember_me"] = False
     with open("settings.json", 'w') as file:
-        json.dump(settings, file)
+        dump(settings, file)
 
 def close_program():
     global Sendsocket
@@ -93,13 +85,6 @@ def close_program():
         Sendsocket.sendall(b"close")
         Sendsocket.close()
     except: pass
-
-def adminlogin():
-    """Sets Loggedin variable to true without needing a proper login."""
-
-    global Loggedin
-    Loggedin = True
-
 
 def create_account(User, Pass) -> bool:
     """Creates a new user account and adds it to userpass.json"""

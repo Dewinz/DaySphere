@@ -1,20 +1,21 @@
 from random import randint, choice
 from math import gcd
-import json
-import socket
+from json import load, dump
+from socket import gethostbyname, gethostname, socket, AF_INET, SOCK_STREAM
 from threading import Lock, local, active_count, Thread
 from os import urandom
 from hashlib import sha256
 
 # Server host ip: 192.168.178.2
-# Default host ip: socket.gethostbyname(socket.gethostname())
+# Default host ip: gethostbyname(gethostname())
 
-HOST = socket.gethostbyname(socket.gethostname())
+HOST = gethostbyname(gethostname())
 PORT = 25565
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-userpass = json.load(open('userpass.json'))
+s = socket(AF_INET, SOCK_STREAM)
+userpass = load(open('userpass.json'))
 userpasslock = Lock()
 Threadlocalvars = local()
+listpunc = {32: None, 91: None, 93: None}
 
 def primes2(n):
     """ Input n>=6, Returns a list of primes, 2 <= p < n """
@@ -132,7 +133,7 @@ class Accounts:
         global Threadlocalvars
         userpasslock.acquire()
         try:
-            if sha256((userpass[User][3] + f"{encpass}".replace(" ","").replace("[","").replace("]","")).encode('UTF-8')).hexdigest() == userpass[User][4]:
+            if sha256((userpass[User][3] + f"{encpass}".translate(listpunc)).encode('UTF-8')).hexdigest() == userpass[User][4]:
                 Pass = RSA.decoder(userpass[User][0:3:2], encpass)
                 Accounts.__savepass(User, Pass)
                 Threadlocalvars.Username = User
@@ -152,10 +153,10 @@ class Accounts:
     
     def __savepass(User:str, Pass:list):
         encvars = list(regenerate_encvars())
-        encpass = sha256((encvars[3] + f"{RSA.encoder(encvars[1:3:1], Pass)}".replace(" ","").replace("[","").replace("]","")).encode('UTF-8')).hexdigest()
+        encpass = sha256((encvars[3] + f"{RSA.encoder(encvars[1:3:1], Pass)}".translate(listpunc)).encode('UTF-8')).hexdigest()
         userpass[User] = encvars+[encpass]
         with open('userpass.json', "w") as file:
-            json.dump(userpass, file)
+            dump(userpass, file)
 
 def Main():
     global s
@@ -170,7 +171,7 @@ def Main():
         
     
 
-def receive_messages(conn:socket.socket):
+def receive_messages(conn:socket):
     while True:
         try:
             data = conn.recv(1024).decode('UTF-8')
@@ -185,7 +186,7 @@ def receive_messages(conn:socket.socket):
                 result = eval(datal[1])
             match datal[0]:
                 case "func->list":
-                    conn.sendall((f"{result!r}".replace(" ", "").replace("[", "").replace("]", "")).encode("UTF-8"))
+                    conn.sendall((f"{result!r}".translate(listpunc)).encode("UTF-8"))
                 case "func->nonit":
                     conn.sendall((str(result)).encode("UTF-8"))
                 case "func->None":
@@ -193,6 +194,3 @@ def receive_messages(conn:socket.socket):
                 case "close":
                     conn.close()
                     break
-                
-if __name__ == "__main__":
-    Main()
