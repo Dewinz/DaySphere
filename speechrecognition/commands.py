@@ -2,27 +2,31 @@ from string import punctuation
 from json import load
 from re import Match, search
 
-
-megadic = {}
+function_dictionary = {}
 
 for key, value in load(open("functions.json")).items():
-    try: megadic[len(key)][key] = value
+    try: function_dictionary[len(key)][key] = value
     except:
-        megadic[len(key)] = {}
-        megadic[len(key)][key] = value
-
+        function_dictionary[len(key)] = {}
+        function_dictionary[len(key)][key] = value
 
 
 keywords=[
     # Added new keywords.
-    "Thanks for here"
-    "Thanks for",
-    "Base here",
-    "Base fare",
-    "Thanks sir",
+    "thanks for here",
+    "thanks for",
+    "base here",
+    "base fare",
+    "thanks sir",
     "they sphere",
     "theysphere",
     "basesphere",
+    "base fair",
+    "basesphere",
+    "ay super",
+    "daysville",
+    "day 2",
+    "desu",
     # Till here.
     "DaySphere",
     "Day's fair",
@@ -48,7 +52,6 @@ for i in range(len(keywords)):
     keywords[i]=keywords[i].lower().translate(str.maketrans('', '', punctuation)).replace(" ","")
 
 
-
 class activation:
     def add(string):
         ret=0
@@ -65,10 +68,11 @@ class activation:
             else: break
         return ret
 
+
 def runfromstring(inputstr):
-    global megadic
-    for lenak in megadic.keys():
-        try: function = megadic[lenak][inputstr[:lenak].lower()]
+    global function_dictionary
+    for lenak in function_dictionary.keys():
+        try: function = function_dictionary[lenak][inputstr[:lenak].lower()]
         except: continue
         
         if type(function) == str: function = [function, "str"]
@@ -79,5 +83,3 @@ def runfromstring(inputstr):
             return eval(function[0] + f"(*{tuple(inputstr[lenak:].lower().split(' ')[1:])})")
         else:
             return eval(function[0] + f"(*{tuple(inputstr[lenak:].lower().split(' ')[1:function[1]+1])})")
-        
-    

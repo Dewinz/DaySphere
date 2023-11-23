@@ -140,7 +140,7 @@ class App(customtkinter.CTk):
         self.geometry("1300x975")
 
         # Sets the constraint on window size.
-        self.minsize(1300 , 975)
+        self.minsize(1300, 975)
 
         # Define a private variable which contains the view.
         self._view = None
@@ -205,7 +205,7 @@ class LoginPage(customtkinter.CTkFrame):
         self.pass_entry = customtkinter.CTkEntry(self, placeholder_text="", show='*')
         self.pass_entry.grid(row=5, column=0, padx=20, pady=(0, 8))
         self.pass_entry.bind("<Return>", command=lambda x: [master.master.switch_view(MainPage) if login(self.user_entry.get(), self.pass_entry.get(), box_state)
-                                                                     else master.error_label.grid(row=1, column=0)])
+                                                                    else master.error_label.grid(row=1, column=0)])
 
         # Checkbox to find whether the log in information should be saved.
         # check_box_state should be in the same state as box_state.

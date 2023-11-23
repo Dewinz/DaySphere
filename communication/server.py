@@ -9,8 +9,8 @@ from hashlib import sha256
 # Server host ip: 192.168.178.2
 # Default host ip: gethostbyname(gethostname())
 
-HOST = gethostbyname(gethostname())
-PORT = 25565
+HOST = "192.168.178.2"
+PORT = 5050
 s = socket(AF_INET, SOCK_STREAM)
 userpass = load(open('userpass.json'))
 userdata = load(open('userdata.json'))

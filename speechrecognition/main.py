@@ -31,7 +31,6 @@ class VR:
         
 
     def Recognize(recognizer: Recognizer, audio):
-        print(recognizer.energy_threshold)
         history("Processing...")
         try:
             text=recognizer.recognize_whisper(audio, "base", False, None, "english", False)

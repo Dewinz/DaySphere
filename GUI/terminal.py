@@ -40,7 +40,7 @@ class TerminalPage(customtkinter.CTkFrame):
         # Binds dev tools to F1 using the terminal entry.
         self.terminal_entry.bind("<F1>", command=lambda x: enable_devtools())
 
-        self.mic_toggle_button = customtkinter.CTkButton(self, text="", command=lambda: VR.main(),
+        self.mic_toggle_button = customtkinter.CTkButton(self, text="", command=lambda: [toggle_mic(self), VR.main()],
                                                          image=customtkinter.CTkImage(light_image=Image.open("assets/mic_closed.png"), dark_image=Image.open("assets/mic_closed.png")))
         self.mic_toggle_button.grid(row=10, column=1, padx=20, pady=20)
         
@@ -140,12 +140,12 @@ def history(str):
 
 mic_state = False
 def toggle_mic(app_instance):
-    # TODO
-    # Integrate onto speech recognition.
-
     global mic_state
     if mic_state:
         mic_state = False
-        app_instance.mic_toggle_button.configure(image=customtkinter.CTkImage(light_image=Image.open(""),
-                                                                              dark_image=Image.open("")))
-    else : mic_state = True
+        app_instance.mic_toggle_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/mic_closed.png"),
+                                                                              dark_image=Image.open("assets/mic_closed.png")))
+    else:
+        mic_state = True
+        app_instance.mic_toggle_button.configure(image=customtkinter.CTkImage(light_image=Image.open("assets/mic_open.png"),
+                                                                              dark_image=Image.open("assets/mic_open.png")))
