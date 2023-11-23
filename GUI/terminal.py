@@ -1,4 +1,5 @@
 import customtkinter
+from GUI.calendar import update_information
 from speechrecognition.commands import runfromstring
 from tkinter import END
 from PIL import Image
@@ -7,11 +8,9 @@ from PIL import Image
 # auto_complete and auto_completion are separate, since auto_complete should show an example of what it will be auto completed to.
 # And auto_completion will actually input that.
 
-dev_tools = False
 
 # TODO
 # Decide if the TerminalPage is even required.
-# Add rowspan to feedback on Terminal.
 
 
 # A class containing the Terminal, other functionality should not be needed.
@@ -21,6 +20,7 @@ class TerminalPage(customtkinter.CTkFrame):
         
         global app_instance, dev_tools
         app_instance = self
+        dev_tools = False
 
         self.columnconfigure(0, weight=1)
 
@@ -65,15 +65,15 @@ class TerminalPage(customtkinter.CTkFrame):
 class TerminalPageFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
-        
+
         from GUI.sidebar import Sidebar
-        
+
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        
+
         self.sidebar = Sidebar(self)
         self.sidebar.grid(row=0, rowspan=2, column=0, stick="ns")
-        
+
         self.terminal_page = TerminalPage(self)
         self.terminal_page.grid(row=1, column=1)
 
@@ -135,8 +135,7 @@ def enable_devtools():
 def history(str):
     global app_instance, dev_tools
     if dev_tools == False: return
-    try: app_instance.history_label.configure(text=str)
-    except: pass
+    app_instance.history_label.configure(text=str)
     
 
 mic_state = False

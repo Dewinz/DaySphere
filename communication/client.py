@@ -86,9 +86,19 @@ def close_program():
         Sendsocket.close()
     except: pass
 
-def create_account(User, Pass) -> bool:
+def create_account(User, Pass, remembered) -> bool:
     """Creates a new user account and adds it to userpass.json"""
-    Sendsocket.sendall(f"func->nonit Accounts.create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
-    if receive() == "True": return True
-
-    return False
+    if remembered == True:
+        Sendsocket.sendall(f"func->list Accounts.create_account(\"{User}\",\"{Pass}\",{remembered})".encode('UTF-8'))
+        try:
+            settings["encpass"] = [int(i) for i in receive().split(",")]
+            settings["user"] = User
+            settings["remember_me"] = True
+            with open("settings.json", 'w') as file:
+                dump(settings, file)
+            return True
+        except:
+            return False
+    else:
+        if receive() == "True": return True
+        return False

@@ -9,8 +9,8 @@ from hashlib import sha256
 # Server host ip: 192.168.178.2
 # Default host ip: gethostbyname(gethostname())
 
-HOST = gethostbyname(gethostname())
-PORT = 25565
+HOST = "192.168.178.2"
+PORT = 5050
 s = socket(AF_INET, SOCK_STREAM)
 userpass = load(open('userpass.json'))
 userpasslock = Lock()
@@ -101,7 +101,7 @@ class RSA:
 
 class Accounts:
 
-    def create_account(User:str, Pass:str):
+    def create_account(User:str, Pass:str, remembered:bool):
         """Adds a new account to userpass.json."""
 
         global userpass
@@ -114,8 +114,12 @@ class Accounts:
             return False
         except KeyError:
             Accounts.__savepass(User, Pass)
-            userpasslock.release()
             Threadlocalvars.Username = User
+            if remembered == True:
+                reencpass = RSA.encoder(userpass[User][1:3:1], Pass)
+                userpasslock.release()
+                return reencpass
+            userpasslock.release()
             return True
 
     def request_key(User:str) -> [int, int]:
@@ -194,3 +198,6 @@ def receive_messages(conn:socket):
                 case "close":
                     conn.close()
                     break
+
+if __name__ == "__main__":
+    Main()
