@@ -9,13 +9,16 @@ from hashlib import sha256
 # Server host ip: 192.168.178.2
 # Default host ip: gethostbyname(gethostname())
 
-HOST = "192.168.178.2"
-PORT = 5050
+HOST = gethostbyname(gethostname())
+PORT = 25565
 s = socket(AF_INET, SOCK_STREAM)
 userpass = load(open('userpass.json'))
+userdata = load(open('userdata.json'))
 userpasslock = Lock()
+userdatalock = Lock()
 Threadlocalvars = local()
-listpunc = {32: None, 91: None, 93: None}
+listpunc = {32: None, 91: None, 93: None, 44: None}
+datatypes = ["Calendar"]
 
 def primes2(n):
     """ Input n>=6, Returns a list of primes, 2 <= p < n """
@@ -104,9 +107,10 @@ class Accounts:
     def create_account(User:str, Pass:str, remembered:bool):
         """Adds a new account to userpass.json."""
 
-        global userpass
-        global userpasslock
+        global userpass, userpasslock
+        global userdata, userdatalock
         global Threadlocalvars
+
         userpasslock.acquire()
         try: 
             userpass[User]
@@ -115,6 +119,11 @@ class Accounts:
         except KeyError:
             Accounts.__savepass(User, Pass)
             Threadlocalvars.Username = User
+            userdatalock.acquire()
+            userdata[User] = {}
+            [userdata[User].update({i:{}}) for i in datatypes]
+            dump(userdata, open('userdata.json', "w"))
+            userdatalock.release()
             if remembered == True:
                 reencpass = RSA.encoder(userpass[User][1:3:1], Pass)
                 userpasslock.release()
@@ -132,8 +141,7 @@ class Accounts:
     def login(User:str, encpass:list, remembered:bool=False) -> bool:
         """Attempts a login."""
         
-        global userpass
-        global userpasslock
+        global userpass, userpasslock
         global Threadlocalvars
         userpasslock.acquire()
         try:
@@ -162,6 +170,22 @@ class Accounts:
         with open('userpass.json', "w") as file:
             dump(userpass, file)
 
+class Data:
+    def save(newdata, datatype):
+        global userdata, userdatalock
+        userdatalock.acquire()
+        try: userdata[Threadlocalvars.Username][datatype] = newdata
+        except: 
+            userdatalock.release()
+            return
+        with open('userdata.json', "w") as file:
+            dump(userdata, file)
+        userdatalock.release()
+
+    def request(datatype):
+        try: return userdata[Threadlocalvars.Username][datatype]
+        except: return False
+
 def Main():
     global s
     s.bind((HOST, PORT))
@@ -185,12 +209,12 @@ def receive_messages(conn:socket):
                 break
         if data:
             print(data)
-            datal = data.split(" ")
+            datal = data.split("\n")
             if len(datal)>1:
                 result = eval(datal[1])
             match datal[0]:
                 case "func->list":
-                    conn.sendall((f"{result!r}".translate(listpunc)).encode("UTF-8"))
+                    conn.sendall((str(result)).encode("UTF-8"))
                 case "func->nonit":
                     conn.sendall((str(result)).encode("UTF-8"))
                 case "func->None":

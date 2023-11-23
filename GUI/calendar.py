@@ -1,16 +1,17 @@
 from ast import Pass
 import customtkinter
-from json import load, dump
 from PIL import Image
 import datetime
+from communication.client import request_data, save_data
 
 selected_date = [1, 11, 2023]
 
 month_offset = 0
-print("Offset initialized with: " + str(month_offset))
 
 original_month = 0
 original_year = 1900
+
+instance = 0
 
 def switch_day_view(date):
     global selected_date
@@ -30,7 +31,6 @@ def divisible(x, y):
 
 def get_starting_day(month, year):
     weekday = datetime.datetime(year, month, 1).weekday()
-    print("Given: " + str(year) + " " + str(month) + " Returned: " + str(weekday))
     if weekday == 0:
         return 0
     else:
@@ -112,14 +112,11 @@ class CalendarDay(customtkinter.CTkButton):
         # Allows outside functions to interact with the current CalendarDay.
         self.date = get_calendar_day()
         
-        global original_month
+        global original_month, information
         
         self.configure(fg_color="#222222" if self.date[1] != original_month and master.master.master.master._get_appearance_mode() == "dark"
                        else "#CCCCCC" if self.date[1] != original_month and master.master.master.master._get_appearance_mode() == "light"
                        else "black" if master.master.master.master._get_appearance_mode() == "dark" else "white")
-
-        with open("calendar.json") as file:
-            information = load(file)
 
         try:
             self.day_label = customtkinter.CTkButton(self, text=f"{self.date[0]} •" if information[f"{self.date[0]}/{self.date[1]}/{self.date[2]}"][0] else self.date, font=customtkinter.CTkFont(size=30), fg_color="transparent", text_color="#1976D2" if datetime.datetime.now().day == self.date[0] and datetime.datetime.now().month == self.date[1] and datetime.datetime.now().year == self.date[2] else "white" if master.master.master.master._get_appearance_mode() == "dark" else "black", hover=False, width=30, command=lambda: [switch_day_view(self.date), master.master.master.master.switch_view(DayViewPage)])
@@ -184,7 +181,7 @@ class Calendar(customtkinter.CTkFrame):
             self.view_button_left = customtkinter.CTkButton(self, width=35, height=35, text="", bg_color="black" if master._get_appearance_mode() == "dark" else "white", corner_radius=12, command=lambda: switch_months(self, -1),
                                                             image=customtkinter.CTkImage(light_image=Image.open("assets/arrow_left.png"), dark_image=Image.open("assets/arrow_left.png")))
         else:
-            self.view_button_left = customtkinter.CTkButton(self, width=20, height=20, text="", bg_color="black", corner_radius=6, command=lambda: switch_months(self, -1),
+            self.view_button_left = customtkinter.CTkButton(self, width=20, height=20, text="", bg_color="black" if master._get_appearance_mode() == "dark" else "white", corner_radius=6, command=lambda: switch_months(self, -1),
                                                             image=customtkinter.CTkImage(light_image=Image.open("assets/arrow_left.png"), dark_image=Image.open("assets/arrow_left.png")))
         self.view_button_left.grid(row=0, column=1, sticky="ne", padx=(10, 0), pady=10)
 
@@ -192,7 +189,7 @@ class Calendar(customtkinter.CTkFrame):
             self.view_button_right = customtkinter.CTkButton(self, width=35, height=35, text="", bg_color="black" if master._get_appearance_mode() == "dark" else "white", corner_radius=12, command=lambda: switch_months(self, 1),
                                                              image=customtkinter.CTkImage(light_image=Image.open("assets/arrow_right.png"), dark_image=Image.open("assets/arrow_right.png")))
         else:
-            self.view_button_right = customtkinter.CTkButton(self, width=20, height=20, text="", bg_color="black", corner_radius=6, command=lambda: switch_months(self, 1),
+            self.view_button_right = customtkinter.CTkButton(self, width=20, height=20, text="", bg_color="black" if master._get_appearance_mode() == "dark" else "white", corner_radius=6, command=lambda: switch_months(self, 1),
                                                              image=customtkinter.CTkImage(light_image=Image.open("assets/arrow_right.png"), dark_image=Image.open("assets/arrow_right.png")))
         self.view_button_right.grid(row=0, column=2, sticky="ne", padx=10, pady=10)
 
@@ -224,6 +221,9 @@ class CalendarPage(customtkinter.CTkFrame):
 
         from GUI.sidebar import Sidebar
         
+        global information
+        information = request_data("Calendar")
+
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         
@@ -238,7 +238,9 @@ class DayView(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
         
-        global selected_date
+        global selected_date, instance, information
+
+        instance = self
         
         self.back_button = customtkinter.CTkButton(self, width=60, height=60, corner_radius=20, text="←", fg_color="transparent", font=customtkinter.CTkFont(size=60), hover=False,
                                                    command=lambda: [mass_update_information(self, selected_date), master.master.switch_view(CalendarPage)], text_color="white" if master._get_appearance_mode() == "dark" else "black")
@@ -249,9 +251,6 @@ class DayView(customtkinter.CTkFrame):
         
         self.add_button = customtkinter.CTkButton(self, text="+", font=customtkinter.CTkFont(size=40), height=50, width=50, command=lambda: [mass_update_information(self, selected_date), master.master.switch_view(DayViewPage)])
         self.add_button.grid(row=1, column=0, padx=10, pady=10, rowspan=5)
-        
-        with open("calendar.json") as file:
-            information = load(file)
 
         try:
             self.entry_trace1 = customtkinter.StringVar(self, information[f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}"][0])
@@ -436,7 +435,7 @@ class DayView(customtkinter.CTkFrame):
         except: pass
         
         try:
-            self.last_entry_trace = customtkinter.StringVar(self, information[f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}"][self.last_entry_index])
+            self.last_entry_trace = customtkinter.StringVar(self, information[f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}"][self.last_entry_index - 1])
         except:
             self.last_entry_trace = customtkinter.StringVar(self)
         
@@ -464,8 +463,7 @@ class DayViewPage(customtkinter.CTkFrame):
 
 
 def get_information(day_instance, date):
-    with open("calendar.json") as file:
-        information = load(file)
+    global information
     view_param = 0
     if day_instance.master.master.master.master.state() == "zoomed":
         view_param = 11
@@ -485,9 +483,7 @@ def get_information(day_instance, date):
 
 
 def update_information(date, new_information, index = None):
-    print(f"Called with {date} and {new_information}")
-    with open("calendar.json") as file:
-        information = load(file)
+    global information
     try:
         information[date][index] = new_information
     except: 
@@ -495,13 +491,11 @@ def update_information(date, new_information, index = None):
             information[date].append(new_information)
         except:
             information[date] = [new_information]
-    with open("calendar.json", 'w') as file:
-        dump(information, file)
+    save_data(information, "Calendar")
 
 
 def mass_update_information(day_instance, date):
-    with open("calendar.json") as file:
-        information = load(file)
+    global information
     indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,]
     new_information = []
     try:
@@ -536,12 +530,14 @@ def mass_update_information(day_instance, date):
             information[f"{date[0]}/{date[1]}/{date[2]}"][index] = new_information[index]
     except: pass
     if day_instance.last_entry.get() != "":
-        try:
-                information[f"{date[0]}/{date[1]}/{date[2]}"][day_instance.last_entry_index -1] = day_instance.last_entry.get()
-        except:
-            information[f"{date[0]}/{date[1]}/{date[2]}"].append(day_instance.last_entry.get())
-    with open("calendar.json", 'w') as file:
-        dump(information, file)
+        
+        try: information[f"{date[0]}/{date[1]}/{date[2]}"][day_instance.last_entry_index -1] = day_instance.last_entry.get()
+        except: 
+            print(date)
+            print(information)
+            information[f"{date[0]}/{date[1]}/{date[2]}"] = [day_instance.last_entry.get()]
+            # information[f"{date[0]}/{date[1]}/{date[2]}"].append(day_instance.last_entry.get())
+    save_data(information, "Calendar")
 
 
 def switch_months(calendar_instance, switch):

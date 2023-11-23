@@ -110,6 +110,11 @@ def change_theme(theme):
     settings["appearance"] = theme_interprator(customtkinter.AppearanceModeTracker.get_mode())
     with open("settings.json", "w") as file:
         dump(settings, file)
+
+def save():
+    from GUI.calendar import mass_update_information, selected_date, instance
+    try: mass_update_information(instance, selected_date)
+    except: pass
     
 # =========== Front-End ===========
 
@@ -141,7 +146,7 @@ class App(customtkinter.CTk):
         self._view = None
         
         # Closes the connection when program is closed.
-        self.protocol("WM_DELETE_WINDOW", lambda: [close_program(), self.destroy()])
+        self.protocol("WM_DELETE_WINDOW", lambda: [save(), close_program(), self.destroy()])
         
         # If you picked "remember me" on last sesssion while logging in immediately try to log in.
         # It currently will immediately go to MainPage.
