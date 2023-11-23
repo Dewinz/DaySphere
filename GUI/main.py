@@ -1,5 +1,5 @@
 import customtkinter
-from communication.client import login, create_account, establish_connection
+from communication.client import login, create_account, establish_connection, logout, close_program
 from GUI.sidebar import Sidebar
 from PIL import ImageTk, Image
 from json import load, dump
@@ -26,6 +26,9 @@ import os
 # remembered should be changed to read a json file to immediately log in.
 with open("settings.json") as file:
     settings = load(file)
+
+# Connects the client to the server.
+establish_connection()
 
 if settings["remember_me"]:
     remembered = login()
@@ -137,14 +140,15 @@ class App(customtkinter.CTk):
         # Define a private variable which contains the view.
         self._view = None
         
+        # Closes the connection when program is closed.
+        self.protocol("WM_DELETE_WINDOW", lambda: [close_program(), self.destroy()])
+        
         # If you picked "remember me" on last sesssion while logging in immediately try to log in.
         # It currently will immediately go to MainPage.
         # But it should first actually try to log in by the server, then go to the MainPage.
         if remembered : self.switch_view(MainPage)
         else : self.switch_view(LoginPageFrame)
-        
-        # Connects the client to the server.
-        establish_connection()
+
 
     def switch_view(self, view):
         # Destroys current frame and replaces it with a new one.
@@ -355,7 +359,7 @@ class SettingsPage(customtkinter.CTkFrame):
         self.settings_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=40))
         self.settings_label.grid(row=0, column=0, padx=20, pady=(20, 0))
         
-        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
+        self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: [master.master.switch_view(LoginPageFrame), logout()])
         self.logout_button.grid(row=3, column=0, padx=20, pady=20)
         
         self.theme_label = customtkinter.CTkLabel(self, text="Theme", font=customtkinter.CTkFont(self, size=20))
