@@ -1,6 +1,7 @@
 import string
 import json
 import re
+from GUI.calendar import update_information
 
 
 megadic = {}

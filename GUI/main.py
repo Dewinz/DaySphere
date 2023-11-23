@@ -2,7 +2,7 @@ import customtkinter
 from communication.client import login, create_account, establish_connection
 from GUI.sidebar import Sidebar
 from PIL import ImageTk, Image
-from json import load
+from json import load, dump
 import os
 
 # TODO
@@ -14,6 +14,11 @@ import os
 # Backgrounds?
 # Load screen (remember me handling)? For example "Connecting to servers" with DS logo that scrolls up after done.
 # Package settings.
+
+# TODAY
+# Proper welcome screen.
+# First time help.
+# Add actual functionality to calendars.
 
 # Notes:
 # For password hiding the assets open_white.png is being used universally since open_black.png doens't look like what it's supposed to.
@@ -72,15 +77,36 @@ def toggle_hidden_creation(app_instance):
 
 
 def password_verification(app_instance):
-    # TODO
-    # Make an error appear rather than outright disabling the button.
-    
     # Horrid line of code, wish I could wrap the text.
     if app_instance.password.get() == app_instance.ver_password.get() and app_instance.username.get() != "" and app_instance.password.get() != "" and app_instance.ver_password.get() != "" and len(app_instance.username.get()) > 5  and len(app_instance.password.get()) > 5  and len(app_instance.ver_password.get()) > 5:
         app_instance.create_account_button.configure(state="normal")
     else:
         app_instance.create_account_button.configure(state="disabled")
 
+
+def theme_interprator(theme):
+    # TODO Make the code more optimised by making it a dictionary.
+    if theme == "Light mode":
+        return "light"
+    if theme == "Dark mode":
+        return "dark"
+    if theme == 0:
+        return "light"
+    if theme == 1:
+        return "dark"
+    if theme == "light":
+        return "Light mode"
+    if theme == "dark":
+        return "Dark mode"
+
+def change_theme(theme):
+    global settings
+
+    customtkinter.set_appearance_mode(theme)
+
+    settings["appearance"] = theme_interprator(customtkinter.AppearanceModeTracker.get_mode())
+    with open("settings.json", "w") as file:
+        dump(settings, file)
     
 # =========== Front-End ===========
 
@@ -88,6 +114,10 @@ def password_verification(app_instance):
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
+        
+        global settings
+        try: customtkinter.set_appearance_mode(settings["appearance"])
+        except: pass
 
         # Sets the titlebar icon.
         self.iconpath = ImageTk.PhotoImage(file=os.path.join("assets","logo@4x.png"))
@@ -96,13 +126,13 @@ class App(customtkinter.CTk):
         
         # Sets the titlebar name.
         self.title("DaySphere")
-        
+
         # Defines the on boot up resolution, would like to change it to be dynamic based off of previous session.
         # AKA if closed on second screen while windowed last session, keep it the same on next startup.
-        self.geometry("1000x750")
+        self.geometry("1300x975")
 
         # Sets the constraint on window size.
-        self.minsize(600, 600)
+        self.minsize(1300 , 975)
 
         # Define a private variable which contains the view.
         self._view = None
@@ -113,6 +143,8 @@ class App(customtkinter.CTk):
         if remembered : self.switch_view(MainPage)
         else : self.switch_view(LoginPageFrame)
         
+        # Connects the client to the server.
+        establish_connection()
 
     def switch_view(self, view):
         # Destroys current frame and replaces it with a new one.
@@ -127,19 +159,13 @@ class App(customtkinter.CTk):
         
         # Rewrites the view onto the screen.
         # Sticky makes the view take up the entire screen.
-        if view == MainPage:
-            self._view.grid(sticky="nesw")
-        else:
-            self._view.grid(sticky="nesw")
+        self._view.grid(sticky="nesw")
 
 
 # Likely the first screen you see on startup, unless if "remembere me" was True, where you should be send to MainPage.
 class LoginPage(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master)
-        
-        # TODO
-        # Place the password hide/show button on the password entry.
         
         # Displays "Log in" text.
         self.login_label = customtkinter.CTkLabel(self, text="Log in", font=customtkinter.CTkFont(self, size=20))
@@ -187,13 +213,13 @@ class LoginPage(customtkinter.CTkFrame):
         self.login_button.grid(row=7, column=0, padx=20, pady=8)
 
         # (TEMPORARY) admin log in button.
-        self.login_button = customtkinter.CTkButton(self, text="Admin Log in", command=lambda: admin_login(master.master))
-        self.login_button.grid(row=8, column=0, padx=20, pady=8)
+        self.admin_login_button = customtkinter.CTkButton(self, text="Admin Log in", command=lambda: admin_login(master.master))
+        self.admin_login_button.grid(row=8, column=0, padx=20, pady=8)
         
         # Create account button.
         self.acc_creation_menu_button = customtkinter.CTkButton(self, text="Create account", command=lambda: master.master.switch_view(AccountCreationPageFrame),
-                                                             fg_color="transparent", hover_color="green", text_color="black" if master.master._get_appearance_mode() == "light"
-                                                                                                                                else "white")
+                                                             fg_color="transparent", hover=False,
+                                                             text_color="black" if master.master._get_appearance_mode() == "light" else "white")
         self.acc_creation_menu_button.grid(row=9, column=0, padx=20, pady=(12, 20))
         
 
@@ -211,7 +237,7 @@ class LoginPageFrame(customtkinter.CTkFrame):
         self.login_page_view.grid(row=1, column=1)
         
         # An error label that only appears after a button has been pressed.
-        self.error_label = ErrorLabel(self, "Username or password is incorrect.")
+        self.error_label = customtkinter.CTkButton(self, fg_color="#B61C1C", border_width=2, border_color="black", corner_radius=20, text="Username or password is incorrect.", font=customtkinter.CTkFont(size=20), width=80, command=lambda: self.error_label.destroy(), hover=False)
         
         # Takes up row=0, allowing for everything to be centered.
         self.offset_label = customtkinter.CTkLabel(self, height=28, text="")
@@ -288,8 +314,8 @@ class AccountCreationPage(customtkinter.CTkFrame):
         # Button that will call the logic to make an account.
         self.create_account_button = customtkinter.CTkButton(self, text="Create Account", state="disabled", 
                                                              command=lambda: [master.master.switch_view(MainPage)
-                                                             if create_account(self.user_entry.get(), self.pass_entry.get()) else master.error_label.grid(row=2, column=0),
-                                                             master.offset_label.grid(row=0, column=0)])
+                                                             if create_account(self.user_entry.get(), self.pass_entry.get(), box_state) else [master.error_label.grid(row=2, column=0, pady=(0, 12)),
+                                                             master.offset_label.grid(row=0, column=0),]])
         self.create_account_button.grid(row=8, column=0, padx=20, pady=8)
         
         # Button to go back to login view.
@@ -312,22 +338,8 @@ class AccountCreationPageFrame(customtkinter.CTkFrame):
         self.account_creation_page = AccountCreationPage(self)
         self.account_creation_page.grid(row=1, column=0)
         
-        self.error_label = ErrorLabel(self, "Account name is already in use.")
+        self.error_label = customtkinter.CTkButton(self, fg_color="#B61C1C", border_width=2, border_color="black", corner_radius=20, text="Account name is already in use.", font=customtkinter.CTkFont(size=20), width=80, command=lambda: self.error_label.destroy(), hover=False)
         self.offset_label = customtkinter.CTkLabel(self, height=28, text="")
-
-
-class ErrorLabel(customtkinter.CTkFrame):
-    def __init__(self, master, error):
-        customtkinter.CTkFrame.__init__(self, master, fg_color="red", border_width=8, border_color="black")
-        
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        
-        # TODO
-        # Beautify in general.
-        
-        self.error_label = customtkinter.CTkLabel(self, text=error, height=28)
-        self.error_label.grid(row=0, column=0)
 
 
 class SettingsPage(customtkinter.CTkFrame):
@@ -338,11 +350,22 @@ class SettingsPage(customtkinter.CTkFrame):
         # The logout_button should also log out server side.
         # Add theme settings.
         
-        self.acc_creation_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=20))
-        self.acc_creation_label.grid(row=0, column=0, padx=10, pady=(20, 0))
+        global settings
+        
+        self.settings_label = customtkinter.CTkLabel(self, text="Settings", font=customtkinter.CTkFont(self, size=40))
+        self.settings_label.grid(row=0, column=0, padx=20, pady=(20, 0))
         
         self.logout_button = customtkinter.CTkButton(self, text="Log out", command=lambda: master.master.switch_view(LoginPageFrame))
-        self.logout_button.grid(row=1, column=0, padx=10, pady=20)
+        self.logout_button.grid(row=3, column=0, padx=20, pady=20)
+        
+        self.theme_label = customtkinter.CTkLabel(self, text="Theme", font=customtkinter.CTkFont(self, size=20))
+        self.theme_label.grid(row=1, column=0, padx=20, pady=10)
+        
+        self.variable = customtkinter.StringVar(self, theme_interprator(theme_interprator(customtkinter.AppearanceModeTracker.get_mode())))
+        self.variable.trace_add("write", lambda x, y, z: change_theme(theme_interprator(self.theme_menu.get())))
+        
+        self.theme_menu = customtkinter.CTkOptionMenu(self, values=["Light mode", "Dark mode"], variable=self.variable)
+        self.theme_menu.grid(row=2, column=0, padx=20, pady=(0, 10))
 
 
 # Boxes our view SettingsPage into a nice Frame, which is the border containing all LoginPage elements.
@@ -375,7 +398,5 @@ class MainPage(customtkinter.CTkFrame):
         self.offset_label = customtkinter.CTkLabel(self, text="")
         self.offset_label.grid(row=3, column=1)
 
-
-establish_connection()
 app = App()
 app.mainloop()

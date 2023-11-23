@@ -1,4 +1,5 @@
 import customtkinter
+from GUI.calendar import update_information
 from speechrecognition.commands import runfromstring
 from tkinter import END
 from PIL import Image
@@ -64,15 +65,15 @@ class TerminalPage(customtkinter.CTkFrame):
 class TerminalPageFrame(customtkinter.CTkFrame):
     def __init__(self, master):
         customtkinter.CTkFrame.__init__(self, master, fg_color="transparent")
-        
+
         from GUI.sidebar import Sidebar
-        
+
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
-        
+
         self.sidebar = Sidebar(self)
         self.sidebar.grid(row=0, rowspan=2, column=0, stick="ns")
-        
+
         self.terminal_page = TerminalPage(self)
         self.terminal_page.grid(row=1, column=1)
 

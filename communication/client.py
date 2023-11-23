@@ -98,7 +98,7 @@ def adminlogin():
     Loggedin = True
 
 
-def create_account(User, Pass) -> bool:
+def create_account(User, Pass, remember_me) -> bool:
     """Creates a new user account and adds it to userpass.json"""
     Sendsocket.sendall(f"func->None create_account(\"{User}\",\"{Pass}\")".encode('UTF-8'))
     # TODO

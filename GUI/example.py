@@ -1,40 +1,27 @@
 from tkinter import *
-import customtkinter
 
-# a subclass of Canvas for dealing with resizing of windows
-class ResizingCanvas(customtkinter.CTkCanvas):
-    def __init__(self,parent,**kwargs):
-        customtkinter.CTkCanvas.__init__(self,parent,**kwargs)
-        self.bind("<Configure>", self.on_resize)
-        self.height = self.winfo_reqheight()
-        self.width = self.winfo_reqwidth()
+root = Tk()
 
-    def on_resize(self,event):
-        # determine the ratio of old width/height to new width/height
-        wscale = float(event.width)/self.width
-        hscale = float(event.height)/self.height
-        self.width = event.width
-        self.height = event.height
-        # resize the canvas 
-        self.config(width=self.width, height=self.height)
-        # rescale all the objects tagged with the "all" tag
-        self.scale("all", 0, 0, wscale, hscale)
+names = ["weight", "bodyfat", "hydration", "muscle", "bones"]
+entry = {}
+label = {}
 
-def main():
-    root = Tk()
-    myframe = Frame(root)
-    myframe.pack(fill=BOTH, expand=YES)
-    mycanvas = ResizingCanvas(myframe,width=850, height=400, bg="red", highlightthickness=0)
-    mycanvas.pack(fill=BOTH, expand=YES)
+i = 0
+for name in names:
+    e = Entry(root)
+    e.grid(sticky=E)
+    entry[name] = e
 
-    # add some widgets to the canvas
-    mycanvas.create_line(0, 0, 200, 100)
-    mycanvas.create_line(0, 100, 200, 0, fill="red", dash=(4, 4))
-    mycanvas.create_rectangle(50, 25, 150, 75, fill="blue")
+    lb = Label(root, text=name)
+    lb.grid(row=i, column=1)
+    label[name] = lb
+    i += 1
 
-    # tag all of the drawn widgets
-    mycanvas.addtag_all("all")
-    root.mainloop()
+def print_all_entries():
+    for name in names:
+        print(entry[name].get())
 
-if __name__ == "__main__":
-    main()
+b = Button(root, text="Print all", command=print_all_entries)
+b.grid(sticky=S)
+
+mainloop()
