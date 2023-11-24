@@ -1,4 +1,3 @@
-from ast import Pass
 import customtkinter
 from PIL import Image
 import datetime
