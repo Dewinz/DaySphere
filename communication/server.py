@@ -1,10 +1,9 @@
-from random import randint, choice
 from math import gcd
 from json import load, dump
 from socket import gethostbyname, gethostname, socket, AF_INET, SOCK_STREAM
 from threading import Lock, local, active_count, Thread
-from os import urandom
 from hashlib import sha256
+from secrets import token_hex, choice
 
 # Server host ip: 192.168.178.2
 # Default host ip: gethostbyname(gethostname())
@@ -33,15 +32,16 @@ def primes2(n):
 
 primeslist = primes2(2000)
 
-def regenerate_encvars(saltlength = 16):
+def regenerate_encvars(saltlength = 32):
     """Set the keys for the RSA encryption algorhithm and generates a salt
     See documentation on algorithm here: https://www.geeksforgeeks.org/rsa-algorithm-cryptography/."""
 
     global primeslist
 
-    prime1 = randint(10,len(primeslist)-1)
-    prime2 = primeslist[choice([randint(0,prime1-1),randint(prime1+1,len(primeslist)-1)])]
-    prime1 = primeslist[prime1]
+    prime1 = choice(primeslist)
+    prime2 = choice(primeslist)
+    while prime2 == prime1:
+        choice(primeslist)
  
     n = prime1 * prime2
     phi = (prime1 - 1) * (prime2 - 1)
@@ -60,7 +60,7 @@ def regenerate_encvars(saltlength = 16):
             break
         private_key += 1
 
-    salt = str(urandom(saltlength)).removeprefix("b\'").removesuffix("\'")
+    salt = token_hex(saltlength)
 
     return private_key, public_key, n, salt
 
@@ -213,9 +213,7 @@ def receive_messages(conn:socket):
             if len(datal)>1:
                 result = eval(datal[1])
             match datal[0]:
-                case "func->list":
-                    conn.sendall((str(result)).encode("UTF-8"))
-                case "func->nonit":
+                case "func->Any":
                     conn.sendall((str(result)).encode("UTF-8"))
                 case "func->None":
                     pass

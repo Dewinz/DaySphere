@@ -3,23 +3,22 @@ from json import dump, load
 
 # Server ip: 84.105.126.31
 # Gopi ip: 84.105.39.48
-with open("settings.json") as file:
-    settings = load(file)
+settings = load(open("settings.json"))
 
 def establish_connection():
-    global Sendsocket
-    Sendsocket = socket(AF_INET, SOCK_STREAM)
-    Sendsocket.connect((settings["host"], settings["port"]))
+    global connection_socket
+    connection_socket = socket(AF_INET, SOCK_STREAM)
+    connection_socket.connect((settings["host"], settings["port"]))
 
 def receive():
     """Returns recieved messages from the server."""
-    return Sendsocket.recv(1024).decode("UTF-8")
+    return connection_socket.recv(1024).decode("UTF-8")
 
 def close_program():
-    global Sendsocket
+    global connection_socket
     try:
-        Sendsocket.sendall(b"close")
-        Sendsocket.close()
+        connection_socket.sendall(b"close")
+        connection_socket.close()
     except: pass
 
 def encrypt(keys:[int, int], message:int|float) -> int:
@@ -50,29 +49,23 @@ def login(user:str = "", password:str = "", remember:bool = False) -> bool:
         remember=True
 
     else:
-        Sendsocket.sendall(f"func->list\nAccounts.request_key(\"{user}\")".encode('UTF-8'))
-        try: keys = [int(i) for i in eval(receive())]
+        connection_socket.sendall(f"func->Any\nAccounts.request_key(\"{user}\")".encode('UTF-8'))
+        try: keys = list(map(int, eval(receive())))
         except ValueError: return False
         encoded = encoder(keys,password)
 
-    if remember == True:
-        Sendsocket.sendall(f"func->list\nAccounts.login(\"{user}\",{encoded},True)".encode("UTF-8"))
-        try:
-            settings["encpass"] = [int(i) for i in eval(receive())]
-            settings["user"] = user
-            settings["remember_me"] = True
-            with open("settings.json", 'w') as file:
-                dump(settings, file)
-            return True
-        except:
-            settings["remember_me"] = False
-            with open("settings.json", 'w') as file:
-                dump(settings, file)
-            return False
-    else:
-        Sendsocket.sendall(f"func->nonit\nAccounts.login(\"{user}\",{encoded})".encode("UTF-8"))
-        if receive() == "True":
-            return True
+    connection_socket.sendall(f"func->Any\nAccounts.login(\"{user}\",{encoded},{remember})".encode("UTF-8"))
+    reply = receive()
+    if reply == "True": return True
+    try:
+        settings["encpass"] = list(map(int, eval(reply)))
+        settings["user"] = user
+        settings["remember_me"] = True
+        dump(settings, open("settings.json", 'w'))
+        return True
+    except: 
+        settings["remember_me"] = False
+        dump(settings, open("settings.json", 'w'))
         return False
 
 def logout():
@@ -81,30 +74,24 @@ def logout():
     # back to true when it shouldn't. Simple fix is to change the variable in the main.py as well as calling this function when logging out.
     global settings
     settings["remember_me"] = False
-    with open("settings.json", 'w') as file:
-        dump(settings, file)
+    dump(settings, open("settings.json", 'w'))
 
 def create_account(User, Pass, remembered) -> bool:
     """Creates a new user account and adds it to userpass.json"""
-    if remembered == True:
-        Sendsocket.sendall(f"func->list\nAccounts.create_account(\"{User}\",\"{Pass}\",{remembered})".encode('UTF-8'))
-        try:
-            settings["encpass"] = [int(i) for i in eval(receive())]
-            settings["user"] = User
-            settings["remember_me"] = True
-            with open("settings.json", 'w') as file:
-                dump(settings, file)
-            return True
-        except:
-            return False
-    else:
-        Sendsocket.sendall(f"func->nonit\nAccounts.create_account(\"{User}\",\"{Pass}\",{remembered})".encode('UTF-8'))
-        if receive() == "True": return True
-        return False
+    connection_socket.sendall(f"func->Any\nAccounts.create_account(\"{User}\",\"{Pass}\",{remembered})".encode('UTF-8'))
+    reply = receive()
+    if reply == "True": return True
+    try:
+        settings["encpass"] = list(map(int, eval(reply)))
+        settings["user"] = User
+        settings["remember_me"] = True
+        dump(settings, open("settings.json", 'w'))
+        return True
+    except: return False
 
 def save_data(data, datatype:str) -> None:
-    Sendsocket.sendall(f"func->None\nData.save({data},\"{datatype}\")".encode('UTF-8'))
+    connection_socket.sendall(f"func->None\nData.save({data},\"{datatype}\")".encode('UTF-8'))
 
 def request_data(datatype:str):
-    Sendsocket.sendall(f"func->nonit\nData.request(\"{datatype}\")".encode('UTF-8'))
+    connection_socket.sendall(f"func->Any\nData.request(\"{datatype}\")".encode('UTF-8'))
     return eval(receive())
