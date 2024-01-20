@@ -33,7 +33,7 @@ class VR:
     def Recognize(recognizer: Recognizer, audio):
         history("Processing...")
         try:
-            text=recognizer.recognize_whisper(audio, "base", False, None, "english", False)
+            text=recognizer.recognize_whisper(audio, "small.en", False, None, "english", False)
             nopunc = str(text).lower().translate(str.maketrans('', '', punctuation))
 
             for keyword in commands.keywords:

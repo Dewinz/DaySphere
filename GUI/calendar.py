@@ -49,6 +49,13 @@ class Date():
             original_year = self.year
             self.month = (self.month + month_offset) % 12
             original_month = self.month
+        elif self.month + month_offset < 1:
+            self.year += divisible(self.month + month_offset, 12) - 1
+            original_year = self.year
+            self.month = (self.month + month_offset) % 12
+            if (self.month == 0):
+                self.month = 12
+            original_month = self.month
         else:
             original_year = self.year
             self.month += month_offset
