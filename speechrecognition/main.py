@@ -43,10 +43,7 @@ class VR:
                     feedback(terminal_command=nopunc[find_with_spaces(keyword, nopunc)+1:], voice=True)
                     break
 
-                 # else: print(keyword+" not found")
-
             history(nopunc)
-             # print("Recognized text: " + text)
 
         except UnknownValueError:
             print("Speech recognition could not understand audio")
@@ -60,7 +57,6 @@ class VR:
             with VR.mic as source:
                 history("Adjusting")
                 VR.recog.adjust_for_ambient_noise(source, 0.5)
-                print(VR.recog.energy_threshold)
             
             listening_thread = VR.recog.listen_in_background(VR.mic, VR.Recognize)
             history("Listening...")

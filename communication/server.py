@@ -151,17 +151,13 @@ class Accounts:
                 Threadlocalvars.Username = User
                 if remembered == True:
                     reencpass = RSA.encoder(userpass[User][1:3:1], Pass)
-                    userpasslock.release()
-                    return reencpass
+                    userpasslock.release(); return reencpass
                 else: 
-                    userpasslock.release()
-                    return True
+                    userpasslock.release(); return True
             else: 
-                userpasslock.release()
-                return False
+                userpasslock.release(); return False
         except: 
-            userpasslock.release()
-            return False
+            userpasslock.release(); return False
     
     def __savepass(User:str, Pass:list):
         encvars = list(regenerate_encvars())
@@ -220,6 +216,9 @@ def receive_messages(conn:socket):
                 case "close":
                     conn.close()
                     break
+                case _:
+                    conn.sendall("☹".encode("UTF-8"))
+                    conn.close()
 
 if __name__ == "__main__":
     Main()
