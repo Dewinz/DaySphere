@@ -65,7 +65,7 @@ def regenerate_encvars(saltlength = 32):
     return private_key, public_key, n, salt
 
 class RSA:
-    def decrypt(keys:[int, int], encrypted_number:int|float):
+    def decrypt(keys:list[int, int], encrypted_number:int|float):
         """Decrypts an encrypted integer/float using a private key and additional number."""
 
         decrypted = 1
@@ -75,7 +75,7 @@ class RSA:
             keys[0] -= 1
         return decrypted
     
-    def decoder(keys:[int, int], encoded_text:list):
+    def decoder(keys:list[int, int], encoded_text:list):
         """Decodes a list of encrypted ascii numbers of letters using a private key and an additional number."""
 
         s = ''
@@ -84,7 +84,7 @@ class RSA:
             s += chr(RSA.decrypt([keys[0], keys[1]], num))
         return s
 
-    def encrypt(keys:[int, int], message:int|float) -> int:
+    def encrypt(keys:list[int, int], message:int|float) -> int:
         """Encrypts a number using a public key and an additional number."""
 
         encrypted_text = 1
@@ -94,7 +94,7 @@ class RSA:
             keys[0] -= 1
         return encrypted_text
 
-    def encoder(keys:[int, int], message: str) -> list:
+    def encoder(keys:list[int, int], message: str) -> list:
         """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
         encoded = []
         # Calling the encrypting function in encoding function
@@ -131,7 +131,7 @@ class Accounts:
             userpasslock.release()
             return True
 
-    def request_key(User:str) -> [int, int]:
+    def request_key(User:str) -> list[int, int]:
         """Function to request a public key and additional number."""
 
         global userpass

@@ -21,7 +21,7 @@ def close_program():
         connection_socket.close()
     except: pass
 
-def encrypt(keys:[int, int], message:int|float) -> int:
+def encrypt(keys:list[int, int], message:int|float) -> int:
     """Encrypts a number using a public key and an additional number."""
 
     encrypted_text = 1
@@ -32,7 +32,7 @@ def encrypt(keys:[int, int], message:int|float) -> int:
     return encrypted_text
 
 
-def encoder(keys:[int, int], message: str) -> list:
+def encoder(keys:list[int, int], message: str) -> list:
     """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
     encoded = []
     # Calling the encrypting function in encoding function
