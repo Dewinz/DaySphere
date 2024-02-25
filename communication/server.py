@@ -136,7 +136,7 @@ class Accounts:
 
         global userpass
         try: return userpass[User][1:3:1]
-        except KeyError: return KeyError
+        except KeyError: return "[0]"
 
     def login(User:str, encpass:list, remembered:bool=False) -> bool:
         """Attempts a login."""
@@ -165,6 +165,10 @@ class Accounts:
         userpass[User] = encvars+[encpass]
         with open('userpass.json', "w") as file:
             dump(userpass, file)
+    
+    def logout():
+        Threadlocalvars.Username = None
+
 
 class Data:
     def save(newdata, datatype):

@@ -291,151 +291,151 @@ class DayView(customtkinter.CTkFrame):
         try:
             self.entry1 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace1, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry1.grid(row=1, column=1, sticky="nw")
-            self.entry1.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry1.get(), 0))
+            self.entry1.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry1.get(), 0), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 2
             
             self.entry2 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace2, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry2.grid(row=2, column=1, sticky="nw")
-            self.entry2.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry2.get(), 1))
+            self.entry2.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry2.get(), 1), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 3
             
             self.entry3 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace3, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry3.grid(row=3, column=1, sticky="nw")
-            self.entry3.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry3.get(), 2))
+            self.entry3.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry3.get(), 2), master.master.switch_view(DayViewPage)])
 
             self.last_entry_index = 4
 
             self.entry4 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace4, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry4.grid(row=4, column=1, sticky="nw")
-            self.entry4.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry4.get(), 3))
+            self.entry4.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry4.get(), 3), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 5
             
             self.entry5 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace5, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry5.grid(row=5, column=1, sticky="nw")
-            self.entry5.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry5.get(), 4))
+            self.entry5.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry5.get(), 4), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 6
             
             self.entry6 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace6, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry6.grid(row=6, column=1, sticky="nw")
-            self.entry6.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry6.get(), 5))
+            self.entry6.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry6.get(), 5), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 7
             
             self.entry7 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace7, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry7.grid(row=7, column=1, sticky="nw")
-            self.entry7.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry7.get(), 6))
+            self.entry7.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry7.get(), 6), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 8
             
             self.entry8 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace8, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry8.grid(row=8, column=1, sticky="nw")
-            self.entry8.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry8.get(), 7))
+            self.entry8.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry8.get(), 7), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 9
             
             self.entry9 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace9, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry9.grid(row=9, column=1, sticky="nw")
-            self.entry9.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry9.get(), 8))
+            self.entry9.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry9.get(), 8), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 10
             
             self.entry10 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace10, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry10.grid(row=10, column=1, sticky="nw")
-            self.entry10.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry10.get(), 9))
+            self.entry10.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry10.get(), 9), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 11
             
             self.entry11 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace11, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry11.grid(row=11, column=1, sticky="nw")
-            self.entry11.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry11.get(), 10))
+            self.entry11.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry11.get(), 10), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 12
             
             self.entry12 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace12, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry12.grid(row=12, column=1, sticky="nw")
-            self.entry12.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry12.get(), 11))
+            self.entry12.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry12.get(), 11), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 13
             
             self.entry13 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace13, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry13.grid(row=13, column=1, sticky="nw")
-            self.entry13.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry13.get(), 12))
+            self.entry13.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry13.get(), 12), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 14
             
             self.entry14 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace14, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry14.grid(row=14, column=1, sticky="nw")
-            self.entry14.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry14.get(), 13))
+            self.entry14.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry14.get(), 13), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 15
             
             self.entry15 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace15, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry15.grid(row=15, column=1, sticky="nw")
-            self.entry15.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry15.get(), 14))
+            self.entry15.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry15.get(), 14), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 16
             
             self.entry16 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace16, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry16.grid(row=16, column=1, sticky="nw")
-            self.entry16.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry16.get(), 15))
+            self.entry16.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry16.get(), 15), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 17
             
             self.entry17 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace17, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry17.grid(row=17, column=1, sticky="nw")
-            self.entry17.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry17.get(), 16))
+            self.entry17.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry17.get(), 16), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 18
             
             self.entry18 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace18, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry18.grid(row=18, column=1, sticky="nw")
-            self.entry18.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry18.get(), 27))
+            self.entry18.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry18.get(), 27), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 19
             
             self.entry19 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace19, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry19.grid(row=19, column=1, sticky="nw")
-            self.entry19.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry19.get(), 18))
+            self.entry19.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry19.get(), 18), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 20
             
             self.entry20 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace20, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry20.grid(row=20, column=1, sticky="nw")
-            self.entry20.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry20.get(), 19))
+            self.entry20.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry20.get(), 19), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 21
             
             self.entry21 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace21, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry21.grid(row=21, column=1, sticky="nw")
-            self.entry21.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry21.get(), 20))
+            self.entry21.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry21.get(), 20), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 22
             
             self.entry22 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace22, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry22.grid(row=22, column=1, sticky="nw")
-            self.entry22.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry22.get(), 21))
+            self.entry22.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry22.get(), 21), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 23
             
             self.entry23 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace23, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry23.grid(row=23, column=1, sticky="nw")
-            self.entry23.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry23.get(), 22))
+            self.entry23.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry23.get(), 22), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 24
             
             self.entry24 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace24, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry24.grid(row=24, column=1, sticky="nw")
-            self.entry24.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry24.get(), 23))
+            self.entry24.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry24.get(), 23), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 25
             
             self.entry25 = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.entry_trace25, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
             self.entry25.grid(row=25, column=1, sticky="nw")
-            self.entry25.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry25.get(), 24))
+            self.entry25.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.entry25.get(), 24), master.master.switch_view(DayViewPage)])
             
             self.last_entry_index = 26
         except: pass
@@ -447,7 +447,7 @@ class DayView(customtkinter.CTkFrame):
         
         self.last_entry = customtkinter.CTkEntry(self, width=800, height=30, placeholder_text="", textvariable=self.last_entry_trace, font=customtkinter.CTkFont(size=20), fg_color="#1D1E1E" if master.master._get_appearance_mode() == "dark" else "white", border_color="Black")
         self.last_entry.grid(row=self.last_entry_index, column=1, sticky="nw")
-        self.last_entry.bind("<Return>", command=lambda x: update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.last_entry.get(), self.last_entry_index - 1))
+        self.last_entry.bind("<Return>", command=lambda x: [update_information(f"{selected_date[0]}/{selected_date[1]}/{selected_date[2]}", self.last_entry.get(), self.last_entry_index - 1), master.master.switch_view(DayViewPage)])
 
 
 
@@ -502,47 +502,44 @@ def update_information(date, new_information, index = None):
 
 def mass_update_information(day_instance, date):
     global information
-    indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,]
     new_information = []
     try:
-        new_information.append(day_instance.entry1.get())
-        new_information.append(day_instance.entry2.get())
-        new_information.append(day_instance.entry3.get())
-        new_information.append(day_instance.entry4.get())
-        new_information.append(day_instance.entry5.get())
-        new_information.append(day_instance.entry6.get())
-        new_information.append(day_instance.entry7.get())
-        new_information.append(day_instance.entry8.get())
-        new_information.append(day_instance.entry9.get())
-        new_information.append(day_instance.entry10.get())
-        new_information.append(day_instance.entry11.get())
-        new_information.append(day_instance.entry12.get())
-        new_information.append(day_instance.entry13.get())
-        new_information.append(day_instance.entry14.get())
-        new_information.append(day_instance.entry15.get())
-        new_information.append(day_instance.entry16.get())
-        new_information.append(day_instance.entry17.get())
-        new_information.append(day_instance.entry18.get())
-        new_information.append(day_instance.entry19.get())
-        new_information.append(day_instance.entry20.get())
-        new_information.append(day_instance.entry21.get())
-        new_information.append(day_instance.entry22.get())
-        new_information.append(day_instance.entry23.get())
-        new_information.append(day_instance.entry24.get())
-        new_information.append(day_instance.entry25.get())
+        if day_instance.entry1.get()!= "": new_information.append(day_instance.entry1.get())
+        if day_instance.entry2.get()!= "": new_information.append(day_instance.entry2.get())
+        if day_instance.entry3.get()!= "": new_information.append(day_instance.entry3.get())
+        if day_instance.entry4.get()!= "": new_information.append(day_instance.entry4.get())
+        if day_instance.entry5.get()!= "": new_information.append(day_instance.entry5.get())
+        if day_instance.entry6.get()!= "": new_information.append(day_instance.entry6.get())
+        if day_instance.entry7.get()!= "": new_information.append(day_instance.entry7.get())
+        if day_instance.entry8.get()!= "": new_information.append(day_instance.entry8.get())
+        if day_instance.entry9.get()!= "": new_information.append(day_instance.entry9.get())
+        if day_instance.entry10.get()!= "": new_information.append(day_instance.entry10.get())
+        if day_instance.entry11.get()!= "": new_information.append(day_instance.entry11.get())
+        if day_instance.entry12.get()!= "": new_information.append(day_instance.entry12.get())
+        if day_instance.entry13.get()!= "": new_information.append(day_instance.entry13.get())
+        if day_instance.entry14.get()!= "": new_information.append(day_instance.entry14.get())
+        if day_instance.entry15.get()!= "": new_information.append(day_instance.entry15.get())
+        if day_instance.entry16.get()!= "": new_information.append(day_instance.entry16.get())
+        if day_instance.entry17.get()!= "": new_information.append(day_instance.entry17.get())
+        if day_instance.entry18.get()!= "": new_information.append(day_instance.entry18.get())
+        if day_instance.entry19.get()!= "": new_information.append(day_instance.entry19.get())
+        if day_instance.entry20.get()!= "": new_information.append(day_instance.entry20.get())
+        if day_instance.entry21.get()!= "": new_information.append(day_instance.entry21.get())
+        if day_instance.entry22.get()!= "": new_information.append(day_instance.entry22.get())
+        if day_instance.entry23.get()!= "": new_information.append(day_instance.entry23.get())
+        if day_instance.entry24.get()!= "": new_information.append(day_instance.entry24.get())
+        if day_instance.entry25.get()!= "": new_information.append(day_instance.entry25.get())
     except: pass
     try:
-        for index in indexes:
-            information[f"{date[0]}/{date[1]}/{date[2]}"][index] = new_information[index]
+        information[f"{date[0]}/{date[1]}/{date[2]}"] = new_information
     except: pass
     if day_instance.last_entry.get() != "":
         
-        try: information[f"{date[0]}/{date[1]}/{date[2]}"][day_instance.last_entry_index -1] = day_instance.last_entry.get()
+        try: information[f"{date[0]}/{date[1]}/{date[2]}"][day_instance.last_entry_index-1] = day_instance.last_entry.get()
         except: 
             print(date)
             print(information)
-            information[f"{date[0]}/{date[1]}/{date[2]}"] = [day_instance.last_entry.get()]
-            # information[f"{date[0]}/{date[1]}/{date[2]}"].append(day_instance.last_entry.get())
+            information[f"{date[0]}/{date[1]}/{date[2]}"].append(day_instance.last_entry.get())
     save_data(information, "Calendar")
 
 

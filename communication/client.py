@@ -22,17 +22,6 @@ def close_program():
     except: pass
 
 
-def encrypt(keys:list[int, int], message:int|float) -> int:
-    """Encrypts a number using a public key and an additional number."""
-
-    encrypted_text = 1
-    while keys[0] > 0:
-        encrypted_text *= message
-        encrypted_text %= keys[1]
-        keys[0] -= 1
-    return encrypted_text
-
-
 def encoder(keys:list[int, int], message: str) -> list:
     """Encodes a string into a list of encrypted ascii numbers using a public key and an additional number."""
 
@@ -86,7 +75,10 @@ def logout():
     # back to true when it shouldn't. Simple fix is to change the variable in the main.py as well as calling this function when logging out.
     global settings
     settings["remember_me"] = False
+    settings["encpass"] = []
+    settings["user"] = ""
     dump(settings, open("settings.json", 'w'))
+    connection_socket.sendall(f"func->None\nAccounts.logout()".encode('UTF-8'))
 
 def create_account(User, Pass, remembered) -> bool:
     """Creates a new user account and adds it to userpass.json"""
