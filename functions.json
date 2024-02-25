@@ -1,5 +1,5 @@
 {
     "add": "activation.add",
     "what is": "activation.add",
-    "update": "parse_information"
+    "schedule": "activation.schedule"
 }
