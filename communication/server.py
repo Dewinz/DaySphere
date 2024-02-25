@@ -1,5 +1,5 @@
 from math import gcd
-from json import load, dump
+from json import load, loads, dump, dumps
 from socket import gethostbyname, gethostname, socket, AF_INET, SOCK_STREAM
 from threading import Lock, local, active_count, Thread
 from hashlib import sha256
@@ -197,7 +197,7 @@ def Main():
         print(f"Connected by {addr}. There are currently {active_count()} connection(s).")
         Thread(target=receive_messages, args=(conn,), daemon=True).start()
         
-    
+userfunctions = {"create_account":Accounts.create_account, "login":Accounts.login, "request_key":Accounts.request_key, "logout":Accounts.logout, "request_data":Data.request, "save_data":Data.save}
 
 def receive_messages(conn:socket):
     while True:
@@ -211,10 +211,10 @@ def receive_messages(conn:socket):
             print(data)
             datal = data.split("\n")
             if len(datal)>1:
-                result = eval(datal[1])
+                result = userfunctions[datal[1]](*map(loads, datal[2::]))
             match datal[0]:
                 case "func->Any":
-                    conn.sendall((str(result)).encode("UTF-8"))
+                    conn.sendall((dumps(result)).encode("UTF-8"))
                 case "func->None":
                     pass
                 case "close":
