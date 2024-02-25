@@ -6,4 +6,4 @@ DaySphere is een huidig alleen een Calendar die bestuurt kan worden met je stem.
 
 ## Hoe installeer ik DaySphere?
 Om DaySphere te installeren moet je git op je computer hebben en dan dit kopiëren en plakken in een terminal (cmd):
-`git clone -b distribution https://github.com/Dewinz/DaySphere`
+``git clone -b distribution https://github.com/Dewinz/DaySphere``
