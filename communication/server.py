@@ -208,7 +208,7 @@ def receive_messages(conn:socket):
                 conn.close()
                 break
         if data:
-            print(data)
+            print(data + "\n")
             datal = data.split("\n")
             if len(datal)>1:
                 result = userfunctions[datal[1]](*map(loads, datal[2::]))
